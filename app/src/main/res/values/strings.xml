@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Path Finder</string>
+    <string name="create_new_graph">Create new graph</string>
 </resources>
