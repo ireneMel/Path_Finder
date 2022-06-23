@@ -32,54 +32,45 @@
         <TextView
             android:id="@+id/create_button"
             style="@style/ButtonStyle"
-            android:background="@drawable/button_ripple"
+
             android:text="@string/create_new_graph"
-            app:drawableLeftCompat="@drawable/ic_add_24"
+            app:drawableLeftCompat="@drawable/ic_add"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/load_button"
             style="@style/ButtonStyle"
-            android:background="@drawable/button_ripple"
-            android:gravity="center"
             android:text="@string/load_from_file"
-            app:drawableLeftCompat="@drawable/ic_download_24" />
+            app:drawableLeftCompat="@drawable/ic_download" />
 
         <TextView
             android:id="@+id/customize_button"
             style="@style/ButtonStyle"
-            android:background="@drawable/button_ripple"
-            android:gravity="center"
-            android:text="@string/choose_custom_theme" />
+            android:text="@string/choose_custom_theme"
+            app:drawableLeftCompat="@drawable/ic_theme" />
 
         <TextView
             android:id="@+id/help_button"
             style="@style/ButtonStyle"
-            android:background="@drawable/button_ripple"
-            android:gravity="center"
             android:text="@string/help"
-            app:drawableLeftCompat="@drawable/ic_help_24" />
+            app:drawableLeftCompat="@drawable/ic_help" />
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:name="com.example.pathfinder.CustomizationFragment"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <TextView
-        android:layout_margin="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/authors"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/authors"
-        android:text="@string/authors" />
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:name="com.example.pathfinder.CustomizationFragment"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_margin="8dp"
+        android:text="@string/authors"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
