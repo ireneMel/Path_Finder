@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--  basic  theme-->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!--  sea  theme-->
+    <color name="blue">#08A0B0</color>
+    <color name="blue_variant">#0A7986</color>
+    <color name="dark_blue">#012C38</color>
+    <color name="dark_blue_variant">#031C26</color>
+
+    <!--  grape  theme-->
+    <color name="light_pink">#795E76</color>
+    <color name="light_pink_variant">#967588</color>
+    <color name="blue_grape">#2B3146</color>
+    <color name="blue_grape_variant">#1B233E</color>
+
+    <!--  spring  theme-->
+    <color name="green">#85BE60</color>
+    <color name="spring_violet">#5c528c</color>
+    <color name="light_violet">#BE9ADA</color>
+    <color name="light_blue">#64A8dd</color>
+
+    <!--  dracula  theme-->
+    <color name="red">#6A1C1C</color>
+    <color name="red_variant">#431212</color>
+    <color name="dark_red">#2C0404</color>
+    <color name="dracula_secondary_variant">#6C3333</color>
+    <color name="dracula_on_secondary">#D36666</color>
 </resources>
