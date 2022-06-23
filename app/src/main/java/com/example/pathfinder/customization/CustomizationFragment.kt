@@ -23,10 +23,7 @@ class CustomizationFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         getThemeColor(requireContext())?.let {
-            ThemeManager.setCustomTheme(
-                requireContext(),
-                it
-            )
+            ThemeManager.setCustomTheme(requireContext(), it)
         }
     }
 
@@ -37,7 +34,6 @@ class CustomizationFragment : Fragment() {
         binding = FragmentCustomizationBinding.inflate(layoutInflater, container, false)
 
         initRecyclerview()
-        addDataset()
 
         return binding.root
     }
@@ -45,15 +41,11 @@ class CustomizationFragment : Fragment() {
     private fun initRecyclerview() {
         binding.recyclerviewTheme.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            themeAdapter = ThemeListAdapter(requireContext(), themeClickListener)
+            themeAdapter = ThemeListAdapter(themeClickListener, DataSource.createDataSet())
             adapter = themeAdapter
         }
     }
-
-    private fun addDataset() {
-        themeAdapter.submitList(DataSource.createDataSet())
-    }
-
+    
     private val themeClickListener = object : ThemeClickListener {
         override fun onChosen(chosenColor: String) {
             if (chosenColor == getThemeColor(requireContext())) {
