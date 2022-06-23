@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/purple_700">
+    android:color="?colorPrimaryVariant">
 
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="@color/purple_500" />
-            <corners android:radius="10dp"/>
+            <solid android:color="?colorPrimaryVariant" />
+            <corners android:radius="20dp"/>
         </shape>
     </item>
 
     <item android:state_pressed="false">
         <shape android:shape="rectangle">
-            <solid android:color="@color/purple_200" />
-            <corners android:radius="10dp"/>
+            <solid android:color="?colorPrimary" />
+            <corners android:radius="20dp"/>
         </shape>
     </item>
-
 
 </ripple>
