@@ -1,45 +1,24 @@
 package com.example.pathfinder
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.pathfinder.customization.CustomizationFragment
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.fragment.app.commit
 import com.example.pathfinder.customization.ThemeManager
-import com.example.pathfinder.customization.ThemeManager.Companion.setCustomTheme
 import com.example.pathfinder.customization.ThemeStorage
-import com.example.pathfinder.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setCustomTheme(this, ThemeStorage.getThemeColor(this).toString())
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.createButton.setOnClickListener {
-
-        }
-
-        //load data from the file
-        binding.loadButton.setOnClickListener {
-
-        }
-
-        //open new fragment with customization options
-        binding.customizeButton.setOnClickListener {
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.fragment_container, CustomizationFragment())
-                .addToBackStack(null)
-                .commit()
-        }
-
-        //manual on how to use the app
-        binding.helpButton.setOnClickListener {
-
-        }
-    }
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setContentView(R.layout.activity_main)
+		ThemeManager.setCustomTheme(
+			this,
+			ThemeStorage.getThemeColor(this).toString()
+		)
+		if (savedInstanceState == null) {
+			supportFragmentManager.commit {
+				replace(R.id.container, GraphCreationFragment())
+			}
+		}
+	}
 }
