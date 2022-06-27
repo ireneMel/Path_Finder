@@ -2,6 +2,7 @@ package com.example.pathfinder.core
 
 import android.graphics.Paint
 import android.graphics.PointF
+import android.os.Build.VERSION_CODES.P
 import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Graph
 import com.example.pathfinder.models.Vertex
@@ -89,10 +90,12 @@ class UIGraph(
 	
 	private val _vertices = mutableListOf<UIVertex?>()
 	private val _edges = mutableListOf<UIEdge>()
-	private val _graph = Graph()
+	private var _graph = Graph()
 	
 	val vertices: List<IUIVertex?> get() = _vertices
 	val edges: List<IUIEdge> get() = _edges
+	val graphEdges: List<List<Edge>> get() = _graph.edges
+	val graphVertices: List<Vertex?> get() = _graph.vertices
 	
 	fun resize(width: Float, height: Float) {
 		val widthScale = width / this.width
@@ -108,6 +111,39 @@ class UIGraph(
 		this.height = height
 	}
 	
+	fun setGraph(graph: Graph) {
+		_graph = graph
+		_vertices.clear()
+		_edges.clear()
+		graphVertices.forEach {
+			_vertices.add(
+				if (it == null) null
+				else UIVertex(
+					position = PointF(it.position.x * width, it.position.y * height),
+					radius = vertexRadius,
+					paint = vertexPaint,
+					strokePaint = vertexStrokePaint,
+					text = if (it.cost == 0f) "" else it.cost.toString(),
+					textPaint = textPaint
+				)
+			)
+		}
+		graphEdges.forEachIndexed { from, edges ->
+			edges.forEach {
+				_edges.add(
+					UIEdge(
+						from = from,
+						to = it.to,
+						strokePaint = vertexStrokePaint,
+						text = if (it.cost == 0f) "" else it.cost.toString(),
+						textPaint = textPaint,
+						textPadding = textPadding
+					)
+				)
+			}
+		}
+	}
+	
 	fun addVertex(position: PointF) {
 		position.x *= width
 		position.y *= height
@@ -118,7 +154,7 @@ class UIGraph(
 		val vertex = UIVertex(position, vertexRadius, vertexPaint, vertexStrokePaint, "", textPaint)
 		_vertices.add(vertex)
 		_graph.edges.add(mutableListOf())
-		_graph.vertices.add(Vertex())
+		_graph.vertices.add(Vertex(PointF(position.x / width, position.y / height)))
 	}
 	
 	fun addEdge(from: Int, to: Int) {
