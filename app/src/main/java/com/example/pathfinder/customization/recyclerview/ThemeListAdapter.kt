@@ -19,25 +19,14 @@ class ThemeListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThemeViewHolder {
         return ThemeViewHolder(
-//            LayoutInflater.from(parent.context).inflate(R.layout.theme_item, parent, false)
             ThemeItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }
 
     override fun onBindViewHolder(holder: ThemeViewHolder, position: Int) {
         val item = themeList[position]
-//
-//        holder.name.text = item.themeName
-//        holder.cardView.setOnClickListener {
-//            listener.onChosen(
-//                themeList[holder.adapterPosition].themeName
-//            )
-//        }
-//
-//        //customize item in recyclerview themself
-//        configureColors(item, holder.cardView)
-        
-        with(holder.binding){
+
+        with(holder.binding) {
             title.text = item.themeName
             themeContainer.setOnClickListener {
                 listener.onChosen(
@@ -64,19 +53,8 @@ class ThemeListAdapter(
     }
 
     private fun setColor(color: Int, cardView: CardView) {
-//        cardView.setCardBackgroundColor(ContextCompat.getColor(context, color))
         cardView.setCardBackgroundColor(ContextCompat.getColor(cardView.context, color))
     }
 
-//    class ThemeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        val name: TextView
-//        val cardView: CardView
-//
-//        init {
-//            cardView = itemView.findViewById(R.id.theme_container)
-//            name = itemView.findViewById(R.id.title);
-//        }
-//    }
-    
     class ThemeViewHolder(val binding: ThemeItemBinding) : RecyclerView.ViewHolder(binding.root)
 }
