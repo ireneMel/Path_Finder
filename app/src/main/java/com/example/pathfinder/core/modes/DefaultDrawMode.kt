@@ -1,18 +1,21 @@
 package com.example.pathfinder.core.modes
 
 import android.graphics.Canvas
-import com.example.pathfinder.core.UIGraph
-import com.example.pathfinder.core.drawEdge
-import com.example.pathfinder.core.drawVertex
-import com.example.pathfinder.core.emptyPointF
+import com.example.pathfinder.core.*
 
 object DefaultDrawMode : DrawMode {
 	override fun onDraw(canvas: Canvas, graph: UIGraph) {
 		graph.edges.forEach {
-			if (it.startPosition != emptyPointF && it.endPosition != emptyPointF) canvas.drawEdge(it)
+			if (!it.isEmpty()){
+				canvas.drawEdge(it)
+				if (it is UIEdgeLabel && it.text.isNotBlank()) canvas.drawEdgeText(it)
+			}
 		}
 		graph.vertices.forEach {
-			if (it != null) canvas.drawVertex(it)
+			if (it != null) {
+				canvas.drawVertex(it)
+				if (it is UIVertexLabel && it.text.isNotBlank()) canvas.drawVertexText(it)
+			}
 		}
 	}
 }

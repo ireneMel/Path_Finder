@@ -23,11 +23,6 @@ class GraphView @JvmOverloads constructor(
 			invalidate()
 		}
 	
-	init {
-		graph = UIGraph(24f, Paint().apply { color = Color.GRAY }, Paint(), Paint())
-		graph?.addVertex(PointF(.5f, .5f))
-	}
-	
 	override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
 		super.onSizeChanged(w, h, oldw, oldh)
 		graph?.resize(w.toFloat(), h.toFloat())
@@ -48,6 +43,7 @@ class GraphView @JvmOverloads constructor(
 		val ret = graph?.let { touchMode.onTouch(event, it) }
 		return if (ret == true) {
 			invalidate()
+		
 			true
 		} else super.onTouchEvent(event)
 	}
