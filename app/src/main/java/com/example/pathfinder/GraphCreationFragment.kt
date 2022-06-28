@@ -3,21 +3,27 @@ package com.example.pathfinder
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.pathfinder.core.AlgoPaint
 import com.example.pathfinder.core.FindUIEdge
 import com.example.pathfinder.core.FindUIVertex
 import com.example.pathfinder.core.UIGraph
+import com.example.pathfinder.core.algorithms.Dijkstra
+import com.example.pathfinder.core.algorithms.GraphAlgorithm
 import com.example.pathfinder.core.modes.*
 import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
 import com.example.pathfinder.core.serialization.read.ReadState
 import com.example.pathfinder.core.serialization.write.FileState
 import com.example.pathfinder.core.serialization.write.SaveGraphToFile
 import com.example.pathfinder.databinding.FragmentGraphCreationBinding
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 
+@Suppress("UNREACHABLE_CODE")
 class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
     private lateinit var binding: FragmentGraphCreationBinding
     private lateinit var uiGraph: UIGraph
@@ -30,9 +36,10 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentGraphCreationBinding.bind(view)
-        uiGraph = UIGraph(25f, Paint().apply {
-            color = Color.CYAN
-        }, Paint().apply {
+		val fillColor = Paint().apply {
+			color = Color.CYAN
+		}
+		uiGraph = UIGraph(25f, fillColor, Paint().apply {
             color = Color.GRAY
             strokeWidth = 3f
         }, Paint().apply {
@@ -69,6 +76,42 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
                 }
             }
         }
+	
+		val startColor = Paint().apply {
+			color = Color.BLUE
+			strokeWidth = 3f
+		}
+	
+		val currentColor = Paint().apply {
+			color = Color.RED
+			strokeWidth = 3f
+		}
+	
+		val algoPaint = AlgoPaint(
+			startPaint = fillColor,
+			startStrokePaint = uiGraph.vertexStrokePaint,
+			endPaint = fillColor,
+			endStrokePaint = uiGraph.vertexStrokePaint,
+			usedPaint = fillColor,
+			usedStrokePaint = startColor,
+			currentPaint = fillColor,
+			currentStrokePaint = currentColor,
+			usedEdgePaint = startColor,
+			currentEdgePaint = currentColor
+		)
+	
+		binding.visualize.setOnClickListener {
+			lifecycleScope.launchWhenStarted {
+				Dijkstra(0, uiGraph.vertices.lastIndex, uiGraph._graph).generate().forEach {
+					uiGraph.setGraphStep(it, algoPaint)
+					Log.d("Debug141", "onViewCreated: $it")
+					binding.graph.invalidate()
+					delay(1000)
+				}
+				uiGraph.clearGraph()
+				binding.graph.invalidate()
+			}
+		}
 
         //load graph when corresponding button was clicked
         if (OPEN_CLICKED) {

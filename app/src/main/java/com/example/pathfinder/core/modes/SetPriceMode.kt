@@ -15,8 +15,8 @@ class SetPriceMode(private val findUIVertex: FindUIVertex, private val findUIEdg
 			return true
 		}
 		val edgeId = findUIEdge.findIndex(PointF(event.x, event.y), graph)
-		if (edgeId != -1) {
-			graph.setEdgeCost(edgeId, 10f)
+		if (edgeId.first != -1) {
+			graph.setEdgeCost(edgeId.first, edgeId.second, 10f)
 			return true
 		}
 		return false
