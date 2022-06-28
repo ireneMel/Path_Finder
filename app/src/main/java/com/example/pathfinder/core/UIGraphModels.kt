@@ -172,8 +172,7 @@ class UIGraph(
 			UIVertex(position, vertexRadius, vertexPaint, vertexStrokePaint, "", textPaint)
 	}
 	
-	fun addEdge(from: Int, to: Int) {
-		_edges[Edge(from, to)] = UIEdge(from, to, edgeStrokePaint, "", textPaint, textPadding)
+	fun addEdge(from: Int, to: Int) { _edges[Edge(from, to)] = UIEdge(from, to, edgeStrokePaint, "", textPaint, textPadding)
 		graph.addEdge(from, to)
 	}
 	
@@ -200,11 +199,13 @@ class UIGraph(
 	}
 	
 	fun setVertexCost(index: Int, cost: Float) {
+		if (cost.isNaN()) return
 		_vertices[index]?.text = cost.toString()
 		graph.vertices[index]?.cost = cost
 	}
 	
 	fun setEdgeCost(edge: Edge) {
+		if (edge.cost.isNaN()) return
 		graph.edges[edge.from]!![edge.to] = edge.cost
 		_edges[edge]?.text = edge.cost.toString()
 	}
