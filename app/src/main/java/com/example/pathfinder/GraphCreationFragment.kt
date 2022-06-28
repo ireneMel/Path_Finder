@@ -57,13 +57,26 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
         binding.graph.graph = uiGraph
         binding.buttonChange.text = texts[mode]
 
-        //load graph when corresponding button was licked
+        lifecycleScope.launchWhenStarted {
+            graphReader.state.collect {
+                when (it) {
+                    ReadState.ERROR -> makeToast("Error while reading file.")
+                    is ReadState.FINISHED -> {
+                        uiGraph.setGraph(it.graph)
+                        makeToast("Success")
+                    }
+                    else -> {}
+                }
+            }
+        }
+
+        //load graph when corresponding button was clicked
         if (OPEN_CLICKED) {
-            openClicked()
+            graphReader.openFile()
             OPEN_CLICKED = false
         }
 
-        binding.open.setOnClickListener { openClicked() }
+        binding.open.setOnClickListener { graphReader.openFile() }
 
         binding.buttonChange.setOnClickListener {
             mode = (mode + 1) % modes.size
@@ -91,23 +104,6 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
                 makeToast("The canvas must not be empty")
             }
         }
-    }
-
-    private fun openClicked() {
-        lifecycleScope.launchWhenStarted {
-            graphReader.state.collect {
-                when (it) {
-                    ReadState.ERROR -> makeToast("Error while reading file.")
-                    is ReadState.FINISHED -> {
-                        uiGraph.setGraph(it.graph)
-                        makeToast("Success")
-                    }
-                    else -> {}
-                }
-            }
-        }
-
-        graphReader.openFile()
     }
 
     private val graphSaver: SaveGraphToFile by lazy {
