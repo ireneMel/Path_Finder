@@ -45,11 +45,11 @@
             android:text="@string/choose_custom_theme"
             app:drawableLeftCompat="@drawable/ic_theme" />
 
-        <TextView
-            android:id="@+id/help_button"
-            style="@style/ButtonStyle"
-            android:text="@string/help"
-            app:drawableLeftCompat="@drawable/ic_help" />
+<!--        <TextView-->
+<!--            android:id="@+id/help_button"-->
+<!--            style="@style/ButtonStyle"-->
+<!--            android:text="@string/help"-->
+<!--            app:drawableLeftCompat="@drawable/ic_help" />-->
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
