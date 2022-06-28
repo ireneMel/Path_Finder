@@ -37,6 +37,9 @@ android {
 
 dependencies {
 
+    //instruction for user
+    implementation 'com.github.shripal17:MaterialIntroView-v2:2.2.0'
+
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
