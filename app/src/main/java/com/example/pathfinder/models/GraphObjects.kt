@@ -34,11 +34,11 @@ class Graph(
 	private var freeIndex: Int = (vertices.maxOfOrNull { it.key } ?: -1) + 1
 	fun addVertex(vertex: Vertex): Int{
 		vertices[freeIndex] = vertex
-		edges[freeIndex] = mutableMapOf()
-		reversedEdges[freeIndex] = mutableMapOf()
 		return freeIndex++
 	}
 	fun addEdge(from: Int, to: Int, cost: Float = Float.NaN){
+		if (edges[from] == null)edges[from] = mutableMapOf()
+		if (reversedEdges[to] == null)reversedEdges[to] = mutableMapOf()
 		edges[from]!![to] = cost
 		reversedEdges[to]!![from] = cost
 	}

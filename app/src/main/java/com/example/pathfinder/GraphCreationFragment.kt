@@ -3,6 +3,7 @@ package com.example.pathfinder
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -20,6 +21,7 @@ import com.example.pathfinder.databinding.FragmentGraphCreationBinding
 import com.example.pathfinder.dialogs.GetPriceDialog
 import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Graph
+import com.example.pathfinder.utils.getThemeColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlin.coroutines.resume
@@ -37,20 +39,32 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		
-		binding = FragmentGraphCreationBinding.bind(view)
-		val fillColor = Paint().apply {
-			color = Color.CYAN
+		val primaryColor = getThemeColor(com.google.android.material.R.attr.colorPrimary)
+		val primaryVariantColor =
+			getThemeColor(com.google.android.material.R.attr.colorPrimaryVariant)
+		val onPrimaryColor = getThemeColor(com.google.android.material.R.attr.colorOnPrimary)
+		val secondaryColor = getThemeColor(com.google.android.material.R.attr.colorSecondary)
+		val secondaryVariantColor =
+			getThemeColor(com.google.android.material.R.attr.colorSecondaryVariant)
+		
+		fun getPaint(color: Int, strokeWidth: Float? = null) = Paint().apply {
+			this.color = color
+			if (strokeWidth != null) this.strokeWidth = strokeWidth
 		}
-		uiGraph = UIGraph(25f, fillColor, Paint().apply {
-			color = Color.GRAY
-			strokeWidth = 3f
-		}, Paint().apply {
-			color = Color.GRAY
-			strokeWidth = 3f
-		}, Paint().apply {
-			color = Color.GRAY
-			textSize = 18f
-		}, 4f, Graph())
+		
+		val _1dp = resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT
+		val fillColor = getPaint(primaryColor)
+		val strokeColor = getPaint(primaryVariantColor, 3 * _1dp)
+		binding = FragmentGraphCreationBinding.bind(view)
+		uiGraph = UIGraph(
+			vertexRadius = 16 * _1dp,
+			vertexPaint = fillColor,
+			vertexStrokePaint = strokeColor,
+			edgeStrokePaint = strokeColor,
+			textPaint = Paint().apply { color = onPrimaryColor; textSize = 12 * _1dp },
+			textPadding = 3 * _1dp,
+			graph = Graph()
+		)
 		val vertexFinder = FindUIVertex(60f)
 		val edgeFinder = FindUIEdge(45f)
 		var mode = 0
@@ -78,35 +92,29 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 			}
 		}
 		
-		val startColor = Paint().apply {
-			color = Color.BLUE
-			strokeWidth = 3f
-		}
+		val usedColor = getPaint(getThemeColor(androidx.appcompat.R.attr.colorAccent), 3*_1dp)
 		
-		val currentColor = Paint().apply {
-			color = Color.RED
-			strokeWidth = 3f
-		}
+		val currentFillColor = getPaint(secondaryColor)
+		
+		val currentStrokeColor = getPaint(secondaryVariantColor, 3*_1dp)
 		
 		val algoPaint = AlgoPaint(
 			startPaint = fillColor,
-			startStrokePaint = uiGraph.vertexStrokePaint,
+			startStrokePaint = strokeColor,
 			endPaint = fillColor,
-			endStrokePaint = uiGraph.vertexStrokePaint,
+			endStrokePaint = strokeColor,
 			usedPaint = fillColor,
-			usedStrokePaint = startColor,
-			currentPaint = fillColor,
-			currentStrokePaint = currentColor,
-			usedEdgePaint = startColor,
-			currentEdgePaint = currentColor
+			usedStrokePaint = usedColor,
+			currentPaint = currentFillColor,
+			currentStrokePaint = currentStrokeColor,
+			usedEdgePaint = usedColor,
+			currentEdgePaint = currentStrokeColor
 		)
 		
 		binding.visualize.setOnClickListener {
 			lifecycleScope.launchWhenStarted {
 				Dijkstra(
-					uiGraph.vertices.keys.first(),
-					uiGraph.vertices.keys.last(),
-					uiGraph.graph
+					uiGraph.vertices.keys.first(), uiGraph.vertices.keys.last(), uiGraph.graph
 				).generate().forEach {
 					uiGraph.setGraphStep(it, algoPaint)
 					Log.d("Debug141", "onViewCreated: $it")
@@ -154,13 +162,14 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		}
 	}
 	
-	private fun onVertexSet(id: Int){
+	private fun onVertexSet(id: Int) {
 		lifecycleScope.launchWhenStarted {
 			uiGraph.setVertexCost(id, getPrice())
 			binding.graph.invalidate()
 		}
 	}
-	private fun onEdgeSet(edge: Edge){
+	
+	private fun onEdgeSet(edge: Edge) {
 		lifecycleScope.launchWhenStarted {
 			edge.cost = getPrice()
 			uiGraph.setEdgeCost(edge)
@@ -168,17 +177,18 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		}
 	}
 	
-	
 	private val dialog = GetPriceDialog()
-	private suspend fun getPrice(): Float = suspendCoroutine{
+	private suspend fun getPrice(): Float = suspendCoroutine {
 		dialog.show(childFragmentManager, null)
 		dialog.setFragmentResultListener(GetPriceDialog.RESULT) { _, bundle ->
 			val result = bundle.getString(GetPriceDialog.RESULT)
-			it.resume(try {
-				result!!.toFloat()
-			} catch (_: Exception) {
-				Float.NaN
-			})
+			it.resume(
+				try {
+					result!!.toFloat()
+				} catch (_: Exception) {
+					Float.NaN
+				}
+			)
 		}
 	}
 	

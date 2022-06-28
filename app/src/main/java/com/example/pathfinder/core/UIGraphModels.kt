@@ -211,10 +211,6 @@ class UIGraph(
 	}
 	
 	fun setGraphStep(graphStep: GraphStep, algoPaint: AlgoPaint) {
-		graphStep.usedVertices.forEach {
-			_vertices[it]?.paint = algoPaint.usedPaint
-			_vertices[it]?.strokePaint = algoPaint.usedStrokePaint
-		}
 		graphStep.start.forEach {
 			_vertices[it]?.paint = algoPaint.startPaint
 			_vertices[it]?.strokePaint = algoPaint.startStrokePaint
@@ -222,6 +218,10 @@ class UIGraph(
 		graphStep.end.forEach {
 			_vertices[it]?.paint = algoPaint.endPaint
 			_vertices[it]?.strokePaint = algoPaint.endStrokePaint
+		}
+		graphStep.usedVertices.forEach {
+			_vertices[it]?.paint = algoPaint.usedPaint
+			_vertices[it]?.strokePaint = algoPaint.usedStrokePaint
 		}
 		graphStep.currentVertices.forEach {
 			_vertices[it]?.paint = algoPaint.currentPaint
