@@ -16,8 +16,8 @@ class RemoveVertexMode(private val findUIVertex: FindUIVertex, private val findU
 			return true
 		}
 		val edgeId = findUIEdge.findIndex(PointF(event.x, event.y), graph)
-		if (edgeId != -1) {
-			graph.removeEdge(edgeId)
+		if (edgeId.first != -1) {
+			graph.removeEdge(edgeId.first, edgeId.second)
 			return true
 		}
 		return true

@@ -2,11 +2,11 @@ package com.example.pathfinder.core
 
 import android.graphics.Paint
 import android.graphics.PointF
-import android.os.Build.VERSION_CODES.P
-import com.example.pathfinder.models.Edge
+import com.example.pathfinder.core.algorithms.GraphStep
+import com.example.pathfinder.models.BidirectionalGraph
+import com.example.pathfinder.models.EdgeTo
 import com.example.pathfinder.models.Graph
 import com.example.pathfinder.models.Vertex
-import kotlin.math.sqrt
 
 interface UIVertex {
 	val position: PointF
@@ -40,6 +40,32 @@ private typealias IUIVertex = UIVertex
 private typealias IUIEdge = UIEdge
 private typealias IUILabel = UILabel
 
+data class AlgoPaint(
+	val startPaint: Paint,
+	val startStrokePaint: Paint,
+	val endPaint: Paint,
+	val endStrokePaint: Paint,
+	val usedPaint: Paint,
+	val usedStrokePaint: Paint,
+	val currentPaint: Paint,
+	val currentStrokePaint: Paint,
+	val usedEdgePaint: Paint,
+	val currentEdgePaint: Paint,
+){
+	init {
+		startPaint.style = Paint.Style.FILL
+		endPaint.style = Paint.Style.FILL
+		usedPaint.style = Paint.Style.FILL
+		currentPaint.style = Paint.Style.FILL
+		startStrokePaint.style = Paint.Style.STROKE
+		endStrokePaint.style = Paint.Style.STROKE
+		usedStrokePaint.style = Paint.Style.STROKE
+		currentStrokePaint.style = Paint.Style.STROKE
+		usedEdgePaint.style = Paint.Style.STROKE
+		currentEdgePaint.style = Paint.Style.STROKE
+	}
+}
+
 class UIGraph(
 	val vertexRadius: Float,
 	val vertexPaint: Paint,
@@ -61,10 +87,10 @@ class UIGraph(
 	private data class UIVertex(
 		override val position: PointF,
 		override val radius: Float,
-		override val paint: Paint,
-		override val strokePaint: Paint,
+		override var paint: Paint,
+		override var strokePaint: Paint,
 		override var text: String,
-		override val textPaint: Paint
+		override var textPaint: Paint
 	) : IUIVertex, UIVertexLabel {
 		override val middle: PointF
 			get() = position
@@ -73,9 +99,9 @@ class UIGraph(
 	private inner class UIEdge(
 		val from: Int,
 		val to: Int,
-		override val strokePaint: Paint,
+		override var strokePaint: Paint,
 		override var text: String,
-		override val textPaint: Paint,
+		override var textPaint: Paint,
 		override val textPadding: Float
 	) : IUIEdge, UIEdgeLabel {
 		override val startPosition: PointF
@@ -89,12 +115,13 @@ class UIGraph(
 	}
 	
 	private val _vertices = mutableListOf<UIVertex?>()
-	private val _edges = mutableListOf<UIEdge>()
-	private var _graph = Graph()
+	private val _edges = mutableListOf<MutableList<UIEdge>>()
+	var _graph: Graph = BidirectionalGraph()
+		private set
 	
 	val vertices: List<IUIVertex?> get() = _vertices
-	val edges: List<IUIEdge> get() = _edges
-	val graphEdges: List<List<Edge>> get() = _graph.edges
+	val edges: List<List<IUIEdge>> get() = _edges
+	val graphEdges: List<List<EdgeTo>> get() = _graph.edges
 	val graphVertices: List<Vertex?> get() = _graph.vertices
 	
 	fun resize(width: Float, height: Float) {
@@ -123,24 +150,22 @@ class UIGraph(
 					radius = vertexRadius,
 					paint = vertexPaint,
 					strokePaint = vertexStrokePaint,
-					text = if (it.cost == 0f) "" else it.cost.toString(),
+					text = if (it.cost.isNaN()) "" else it.cost.toString(),
 					textPaint = textPaint
 				)
 			)
 		}
 		graphEdges.forEachIndexed { from, edges ->
-			edges.forEach {
-				_edges.add(
-					UIEdge(
-						from = from,
-						to = it.to,
-						strokePaint = vertexStrokePaint,
-						text = if (it.cost == 0f) "" else it.cost.toString(),
-						textPaint = textPaint,
-						textPadding = textPadding
-					)
+			_edges.add(edges.mapTo(mutableListOf()) {
+				UIEdge(
+					from = from,
+					to = it.to,
+					strokePaint = vertexStrokePaint,
+					text = if (it.cost.isNaN()) "" else it.cost.toString(),
+					textPaint = textPaint,
+					textPadding = textPadding
 				)
-			}
+			})
 		}
 	}
 	
@@ -153,14 +178,14 @@ class UIGraph(
 	fun addVertexWithLocalSize(position: PointF) {
 		val vertex = UIVertex(position, vertexRadius, vertexPaint, vertexStrokePaint, "", textPaint)
 		_vertices.add(vertex)
+		_edges.add(mutableListOf())
 		_graph.edges.add(mutableListOf())
 		_graph.vertices.add(Vertex(PointF(position.x / width, position.y / height)))
 	}
 	
 	fun addEdge(from: Int, to: Int) {
-		val edge = UIEdge(from, to, edgeStrokePaint, "", textPaint, textPadding)
-		_edges.add(edge)
-		_graph.edges[from].add(Edge(to))
+		_edges[from].add(UIEdge(from, to, edgeStrokePaint, "", textPaint, textPadding))
+		_graph.addEdge(from, to)
 	}
 	
 	fun addEdge(from: IUIVertex, to: IUIVertex) {
@@ -180,15 +205,9 @@ class UIGraph(
 		if (id != -1) removeVertex(id)
 	}
 	
-	fun removeEdge(index: Int) {
-		val edge = _edges[index]
-		_graph.edges[edge.from].removeAt(_graph.edges[edge.from].indexOfFirst { it.to == edge.to })
-		_edges.removeAt(index)
-	}
-	
-	fun removeEdge(edge: IUIEdge) {
-		val id = _edges.indexOf(edge)
-		if (id != -1) removeEdge(id)
+	fun removeEdge(from: Int, index: Int) {
+		_graph.edges[from].removeAt(index)
+		_edges[from].removeAt(index)
 	}
 	
 	fun setVertexCost(index: Int, cost: Float) {
@@ -201,15 +220,46 @@ class UIGraph(
 		if (id != -1) setVertexCost(id, cost)
 	}
 	
-	fun setEdgeCost(index: Int, cost: Float) {
-		val edge = _edges[index]
-		edge.text = cost.toString()
-		_graph.edges[edge.from].find { it.to == edge.to }?.cost = cost
+	fun setEdgeCost(from: Int, index: Int, cost: Float) {
+		_edges[from][index].text = cost.toString()
+		_graph.setCost(from, _edges[from][index].to, cost)
 	}
 	
-	fun setEdgeCost(edge: IUIEdge, cost: Float) {
-		val id = _edges.indexOf(edge)
-		if (id != -1) setEdgeCost(id, cost)
+	fun setGraphStep(graphStep: GraphStep, algoPaint: AlgoPaint) {
+		graphStep.usedVertices.forEach {
+			_vertices[it]?.paint = algoPaint.usedPaint
+			_vertices[it]?.strokePaint = algoPaint.usedStrokePaint
+		}
+		graphStep.start.forEach {
+			_vertices[it]?.paint = algoPaint.startPaint
+			_vertices[it]?.strokePaint = algoPaint.startStrokePaint
+		}
+		graphStep.end.forEach {
+			_vertices[it]?.paint = algoPaint.endPaint
+			_vertices[it]?.strokePaint = algoPaint.endStrokePaint
+		}
+		graphStep.currentVertices.forEach {
+			_vertices[it]?.paint = algoPaint.currentPaint
+			_vertices[it]?.strokePaint = algoPaint.currentStrokePaint
+		}
+		graphStep.usedEdges.forEach {usedEdge->
+			_edges[usedEdge.from].find { it.to == usedEdge.to}?.strokePaint = algoPaint.usedEdgePaint
+			_edges[usedEdge.to].find { it.from == usedEdge.to}?.strokePaint = algoPaint.usedEdgePaint
+		}
+		graphStep.currentEdges.forEach {currentEdge->
+			_edges[currentEdge.from].find { it.to == currentEdge.to}?.strokePaint = algoPaint.currentEdgePaint
+			_edges[currentEdge.to].find { it.from == currentEdge.to}?.strokePaint = algoPaint.currentEdgePaint
+		}
+	}
+	
+	fun clearGraph(){
+		_vertices.forEach {
+			it?.paint = vertexPaint
+			it?.strokePaint = vertexStrokePaint
+		}
+		_edges.flatten().forEach {
+			it.strokePaint = edgeStrokePaint
+		}
 	}
 }
 
@@ -235,7 +285,8 @@ class FindUIEdge(radius: Float) {
 	private val radiusSquared = radius * radius
 	
 	fun find(position: PointF, uiGraph: UIGraph): IUIEdge? {
-		return uiGraph.edges.getOrNull(findIndex(position, uiGraph))
+		val index = findIndex(position, uiGraph)
+		return if (index.first == -1) null else uiGraph.edges[index.first][index.second]
 	}
 	
 	private fun PointF.distTo(edge: IUIEdge) = shortestDistance(
@@ -261,14 +312,15 @@ class FindUIEdge(radius: Float) {
 		return dx * dx + dy * dy
 	}
 	
-	fun findIndex(position: PointF, uiGraph: UIGraph): Int {
+	fun findIndex(position: PointF, uiGraph: UIGraph): Pair<Int, Int> {
 		val edges = uiGraph.edges
-		
-		for (index in edges.indices.reversed()) {
-			if (edges[index].isEmpty()) continue
-			if (position.distTo(edges[index]) < radiusSquared) return index
+		for (from in edges.indices.reversed()) {
+			for (id in edges[from].indices){
+				if (edges[from][id].isEmpty()) continue
+				if (position.distTo(edges[from][id]) < radiusSquared) return Pair(from, id)
+			}
 		}
-		return -1
+		return Pair(-1,-1)
 	}
 }
 
