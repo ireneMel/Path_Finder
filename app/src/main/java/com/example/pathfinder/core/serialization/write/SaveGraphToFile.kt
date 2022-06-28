@@ -2,15 +2,17 @@ package com.example.pathfinder.core.serialization.write
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.LifecycleOwner
 import com.example.pathfinder.core.UIGraph
-import com.example.pathfinder.models.Edge
+import com.example.pathfinder.models.EdgeTo
 import com.example.pathfinder.models.Vertex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.OutputStream
 import kotlin.properties.Delegates
 
 class SaveGraphToFile(
@@ -50,7 +52,7 @@ class SaveGraphToFile(
 			val graphVertexes = graph.graphVertices
 			val graphEdges = graph.graphEdges
 			
-			contentResolver.openOutputStream(uri!!)?.use {
+			contentResolver.openOutputStream(uri!!,"rwt")?.use {
 				it.write("{\n".toByteArray())
 				for (vertex in graphVertexes) {
 					it.write(vertex.save().toByteArray())
@@ -75,6 +77,6 @@ class SaveGraphToFile(
 	private fun Vertex?.save(): String =
 		if (this == null) "(null)\n" else "(${position.x} ${position.y} $cost)\n"
 	
-	private fun Edge.save(from: Int): String = "($from $to $cost)\n"
+	private fun EdgeTo.save(from: Int): String = "($from $to $cost)\n"
 	
 }

@@ -8,8 +8,9 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.LifecycleOwner
 import com.example.pathfinder.core.serialization.write.FILE_TYPE
-import com.example.pathfinder.models.Edge
+import com.example.pathfinder.models.EdgeTo
 import com.example.pathfinder.models.Graph
+import com.example.pathfinder.models.UnidirectionalGraph
 import com.example.pathfinder.models.Vertex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,7 +55,7 @@ class ReadGraphFromFile(
 					val results = groupRegex.findAll(text).take(2).toList()
 					val vertices = readVertices(results[0].value)
 					val edges = readEdges(vertices.size, results[1].value)
-					_state.value = ReadState.FINISHED(Graph(vertices, edges))
+					_state.value = ReadState.FINISHED(UnidirectionalGraph(vertices, edges))
 				}
 			} else {
 				_state.value = ReadState.ERROR
@@ -72,11 +73,11 @@ class ReadGraphFromFile(
 		return Vertex(PointF(x,y), cost)
 	}
 	
-	private fun readEdges(size: Int, text: String): MutableList<MutableList<Edge>> {
-		val ret = MutableList(size){ mutableListOf<Edge>() }
+	private fun readEdges(size: Int, text: String): MutableList<MutableList<EdgeTo>> {
+		val ret = MutableList(size){ mutableListOf<EdgeTo>() }
 		itemRegex.findAll(text).forEach {
-			val (from,to,cost) = it.value.substring(1,it.value.length - 2).split(' ')
-			ret[from.toInt()].add(Edge(to.toInt(), cost.toFloat()))
+			val (from,to,cost) = it.value.substring(1,it.value.length - 1).split(' ')
+			ret[from.toInt()].add(EdgeTo(to.toInt(), cost.toFloat()))
 		}
 		return ret
 	}
