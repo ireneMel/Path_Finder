@@ -8,14 +8,12 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.LifecycleOwner
 import com.example.pathfinder.core.serialization.write.FILE_TYPE
-import com.example.pathfinder.models.EdgeTo
 import com.example.pathfinder.models.Graph
-import com.example.pathfinder.models.UnidirectionalGraph
 import com.example.pathfinder.models.Vertex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-sealed class ReadState{
+sealed class ReadState {
 	object IDLE : ReadState()
 	object READING : ReadState()
 	object ERROR : ReadState()
@@ -28,9 +26,10 @@ class ReadGraphFromFile(
 	private val contentResolver: ContentResolver
 ) {
 	
-	companion object{
+	companion object {
 		private const val READ = "READ"
 	}
+	
 	private val _state = MutableStateFlow<ReadState>(ReadState.IDLE)
 	val state = _state.asStateFlow()
 	fun openFile() {
@@ -45,39 +44,46 @@ class ReadGraphFromFile(
 	private val groupRegex = Regex("\\{[\\s\\S]*?\\}")
 	private val itemRegex = Regex("\\([\\s\\S]*?\\)")
 	
-	private val getResultOpenFile =
-		registry.register(READ, lifecycleOwner, ActivityResultContracts.StartActivityForResult()) { result ->
-			if (result.resultCode == Activity.RESULT_OK) {
-				val data = result.data
-				val uri = data?.data
-				contentResolver.openInputStream(uri!!)?.use {
-					val text = it.bufferedReader().readText()
-					val results = groupRegex.findAll(text).take(2).toList()
-					val vertices = readVertices(results[0].value)
-					val edges = readEdges(vertices.size, results[1].value)
-					_state.value = ReadState.FINISHED(UnidirectionalGraph(vertices, edges))
-				}
-			} else {
-				_state.value = ReadState.ERROR
+	private val getResultOpenFile = registry.register(
+		READ,
+		lifecycleOwner,
+		ActivityResultContracts.StartActivityForResult()
+	) { result ->
+		if (result.resultCode == Activity.RESULT_OK) {
+			val data = result.data
+			val uri = data?.data
+			contentResolver.openInputStream(uri!!)?.use {
+				val text = it.bufferedReader().readText()
+				val results = groupRegex.findAll(text).take(2).toList()
+				val vertices = readVertices(results[0].value)
+				val edges = readEdges(results[1].value)
+				_state.value = ReadState.FINISHED(Graph(vertices, edges))
 			}
+		} else {
+			_state.value = ReadState.ERROR
 		}
-	
-	private fun readVertices(text: String): MutableList<Vertex?> =
-		itemRegex.findAll(text).map {
-			readVertex(it.value.substring(1,it.value.length - 1))
-		}.toMutableList()
-	
-	private fun readVertex(text: String): Vertex?{
-		if (text == "null") return null
-		val (x,y,cost) = text.split(' ').map { it.toFloat() }
-		return Vertex(PointF(x,y), cost)
 	}
 	
-	private fun readEdges(size: Int, text: String): MutableList<MutableList<EdgeTo>> {
-		val ret = MutableList(size){ mutableListOf<EdgeTo>() }
+	private fun readVertices(text: String): HashMap<Int, Vertex>{
+		val map = hashMapOf<Int, Vertex>()
+		itemRegex.findAll(text).forEach{
+			map.readVertex(it.value.substring(1, it.value.length - 1))
+		}
+		return map
+	}
+	
+	private fun HashMap<Int, Vertex>.readVertex(text: String) {
+		val (id, x, y, cost) = text.split(' ')
+		this[id.toInt()] = Vertex(PointF(x.toFloat(), y.toFloat()), cost.toFloat())
+	}
+	
+	private fun readEdges(text: String): MutableMap<Int,MutableMap<Int, Float>> {
+		val ret = mutableMapOf<Int, MutableMap<Int, Float>>()
 		itemRegex.findAll(text).forEach {
-			val (from,to,cost) = it.value.substring(1,it.value.length - 1).split(' ')
-			ret[from.toInt()].add(EdgeTo(to.toInt(), cost.toFloat()))
+			val (from, to, cost) = it.value.substring(1, it.value.length - 1).split(' ')
+			val fromId = from.toInt()
+			if (ret[fromId] == null) ret[fromId] = mutableMapOf()
+			ret[fromId]!![to.toInt()] = cost.toFloat()
 		}
 		return ret
 	}

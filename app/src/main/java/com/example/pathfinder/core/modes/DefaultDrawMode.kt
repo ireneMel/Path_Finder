@@ -5,19 +5,13 @@ import com.example.pathfinder.core.*
 
 object DefaultDrawMode : DrawMode {
 	override fun onDraw(canvas: Canvas, graph: UIGraph) {
-		graph.edges.forEach {
-			it.forEach {
-				if (!it.isEmpty()){
-					canvas.drawEdge(it)
-					if (it is UIEdgeLabel && it.text.isNotBlank()) canvas.drawEdgeText(it)
-				}
-			}
+		for ((_, edge) in graph.edges) {
+			canvas.drawEdge(edge)
+			if (edge is UIEdgeLabel && edge.text.isNotBlank()) canvas.drawEdgeText(edge)
 		}
-		graph.vertices.forEach {
-			if (it != null) {
-				canvas.drawVertex(it)
-				if (it is UIVertexLabel && it.text.isNotBlank()) canvas.drawVertexText(it)
-			}
+		for ((_, vertex) in graph.vertices) {
+			canvas.drawVertex(vertex)
+			if (vertex is UIVertexLabel && vertex.text.isNotBlank()) canvas.drawVertexText(vertex)
 		}
 	}
 }

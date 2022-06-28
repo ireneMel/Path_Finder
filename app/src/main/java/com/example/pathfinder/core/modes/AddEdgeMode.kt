@@ -9,7 +9,8 @@ import com.example.pathfinder.core.UIVertex
 import com.example.pathfinder.core.emptyPointF
 
 class AddEdgeMode(private val findUIVertex: FindUIVertex) : TouchMode, DrawMode {
-	private var start: UIVertex? = null
+	private var startIndex: Int = -1
+	private val startPosition = PointF()
 	private var end = emptyPointF
 	
 	override fun onTouch(event: MotionEvent, graph: UIGraph): Boolean {
@@ -28,7 +29,8 @@ class AddEdgeMode(private val findUIVertex: FindUIVertex) : TouchMode, DrawMode 
 	}
 	
 	private fun startDrag(position: PointF, graph: UIGraph) {
-		start = findUIVertex.find(position, graph)
+		startIndex = findUIVertex.findIndex(position, graph)
+		graph.vertices[startIndex]?.let { startPosition.set(it.position) }
 	}
 	
 	private fun drag(position: PointF) {
@@ -36,18 +38,19 @@ class AddEdgeMode(private val findUIVertex: FindUIVertex) : TouchMode, DrawMode 
 	}
 	
 	private fun endDrag(position: PointF, graph: UIGraph) {
-		val vertex = findUIVertex.find(position, graph)
-		if (start != null && vertex != null) {
-			graph.addEdge(start!!, vertex)
+		val endIndex = findUIVertex.findIndex(position, graph)
+		if (startIndex != -1 && endIndex != -1) {
+			graph.addEdge(startIndex, endIndex)
 		}
-		start = null
+		startIndex = -1
 		end.x = Float.NaN
 	}
 	
+	
 	override fun onDraw(canvas: Canvas, graph: UIGraph) {
-		if (start != null && end != emptyPointF) {
+		if (startIndex != -1 && end != emptyPointF) {
 			canvas.drawLine(
-				start!!.position.x, start!!.position.y, end.x, end.y, graph.edgeStrokePaint
+				startPosition.x, startPosition.y, end.x, end.y, graph.edgeStrokePaint
 			)
 		}
 		DefaultDrawMode.onDraw(canvas, graph)

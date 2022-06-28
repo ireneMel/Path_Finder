@@ -2,17 +2,15 @@ package com.example.pathfinder.core.serialization.write
 
 import android.app.Activity
 import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.LifecycleOwner
 import com.example.pathfinder.core.UIGraph
-import com.example.pathfinder.models.EdgeTo
+import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Vertex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.io.OutputStream
 import kotlin.properties.Delegates
 
 class SaveGraphToFile(
@@ -24,11 +22,11 @@ class SaveGraphToFile(
 		private const val WRITE = "WRITE"
 	}
 	
-	private var graph: UIGraph by Delegates.notNull()
+	private var uiGraph: UIGraph by Delegates.notNull()
 	private val _state = MutableStateFlow(FileState.OPENED)
 	val state = _state.asStateFlow()
 	fun createFile(graph: UIGraph) {
-		this.graph = graph
+		this.uiGraph = graph
 		_state.value = FileState.OPENED
 		if (graph.vertices.isEmpty()) {
 			_state.value = FileState.ERROR
@@ -49,21 +47,19 @@ class SaveGraphToFile(
 			val data = result.data
 			val uri = data?.data
 			
-			val graphVertexes = graph.graphVertices
-			val graphEdges = graph.graphEdges
-			
-			contentResolver.openOutputStream(uri!!,"rwt")?.use {
+			contentResolver.openOutputStream(uri!!, "rwt")?.use {
 				it.write("{\n".toByteArray())
-				for (vertex in graphVertexes) {
-					it.write(vertex.save().toByteArray())
+				val graph = uiGraph.graph
+				for ((id, vertex) in graph.vertices) {
+					it.write(vertex.save(id).toByteArray())
 				}
 				it.write("}\n".toByteArray())
 				
 				//edges
 				it.write("{\n".toByteArray())
-				for (id in graphEdges.indices) {
-					for (edge in graphEdges[id]) {
-						it.write(edge.save(id).toByteArray())
+				for ((from, map) in graph.edges){
+					for ((to, cost) in map){
+						it.write(saveEdge(from, to, cost).toByteArray())
 					}
 				}
 				it.write("}".toByteArray())
@@ -74,9 +70,9 @@ class SaveGraphToFile(
 		}
 	}
 	
-	private fun Vertex?.save(): String =
-		if (this == null) "(null)\n" else "(${position.x} ${position.y} $cost)\n"
+	private fun Vertex.save(id: Int): String =
+		"($id ${position.x} ${position.y} $cost)\n"
 	
-	private fun EdgeTo.save(from: Int): String = "($from $to $cost)\n"
+	private fun saveEdge(from: Int, to: Int, cost: Float): String = "($from $to $cost)\n"
 	
 }

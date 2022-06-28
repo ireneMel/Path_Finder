@@ -6,60 +6,40 @@ data class Vertex(
 	val position: PointF, var cost: Float = Float.NaN
 )
 
-data class EdgeTo(
-	val to: Int, var cost: Float = Float.NaN
-) : Comparable<EdgeTo> {
-	override operator fun compareTo(other: EdgeTo): Int {
-		return cost.compareTo(other.cost)
-	}
-}
-
 data class Edge(
 	val from: Int, val to: Int, var cost: Float = Float.NaN
-)
-
-abstract class Graph(
-	val vertices: MutableList<Vertex?> = mutableListOf(),
-	val edges: MutableList<MutableList<EdgeTo>> = mutableListOf()
-) {
-	abstract fun addEdge(from: Int, to: Int, cost: Float = Float.NaN)
-	abstract fun setCost(from: Int, to: Int, cost: Float)
-}
-
-class UnidirectionalGraph(
-	vertices: MutableList<Vertex?> = mutableListOf(),
-	edges: MutableList<MutableList<EdgeTo>> = mutableListOf()
-) : Graph(vertices, edges) {
-	override fun addEdge(from: Int, to: Int, cost: Float) {
-		edges[from].add(EdgeTo(to, cost))
+){
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (other !is Edge) return false
+		
+		if (from != other.from) return false
+		if (to != other.to) return false
+		
+		return true
 	}
 	
-	override fun setCost(from: Int, to: Int, cost: Float) {
-		edges[from].find { it.to == to }?.cost = cost
+	override fun hashCode(): Int {
+		var result = from
+		result = 31 * result + to
+		return result
 	}
 }
 
-class BidirectionalGraph(
-	vertices: MutableList<Vertex?> = mutableListOf(),
-	edges: MutableList<MutableList<EdgeTo>> = mutableListOf()
-) : Graph(vertices, edges) {
-	override fun addEdge(from: Int, to: Int, cost: Float) {
-		edges[from].add(EdgeTo(to, cost))
-		edges[to].add(EdgeTo(from, cost))
+class Graph(
+	val vertices: MutableMap<Int, Vertex> = mutableMapOf(),
+	val edges: MutableMap<Int, MutableMap<Int, Float>> = mutableMapOf(),
+	val reversedEdges: MutableMap<Int, MutableMap<Int, Float>> = mutableMapOf(),
+){
+	private var freeIndex: Int = (vertices.maxOfOrNull { it.key } ?: -1) + 1
+	fun addVertex(vertex: Vertex): Int{
+		vertices[freeIndex] = vertex
+		edges[freeIndex] = mutableMapOf()
+		reversedEdges[freeIndex] = mutableMapOf()
+		return freeIndex++
 	}
-	
-	override fun setCost(from: Int, to: Int, cost: Float) {
-		edges[from].find { it.to == to }?.cost = cost
-		edges[to].find { it.to == from }?.cost = cost
+	fun addEdge(from: Int, to: Int, cost: Float = Float.NaN){
+		edges[from]!![to] = cost
+		reversedEdges[to]!![from] = cost
 	}
-}
-
-fun UnidirectionalGraph.reversed(): UnidirectionalGraph {
-	val edges = MutableList(edges.size) { mutableListOf<EdgeTo>() }
-	for (from in this.edges.indices) {
-		for (edgeTo in this.edges[from]) {
-			edges[edgeTo.to].add(EdgeTo(from, edgeTo.cost))
-		}
-	}
-	return UnidirectionalGraph(vertices, edges)
 }

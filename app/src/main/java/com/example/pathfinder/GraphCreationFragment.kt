@@ -13,13 +13,13 @@ import com.example.pathfinder.core.FindUIEdge
 import com.example.pathfinder.core.FindUIVertex
 import com.example.pathfinder.core.UIGraph
 import com.example.pathfinder.core.algorithms.Dijkstra
-import com.example.pathfinder.core.algorithms.GraphAlgorithm
 import com.example.pathfinder.core.modes.*
 import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
 import com.example.pathfinder.core.serialization.read.ReadState
 import com.example.pathfinder.core.serialization.write.FileState
 import com.example.pathfinder.core.serialization.write.SaveGraphToFile
 import com.example.pathfinder.databinding.FragmentGraphCreationBinding
+import com.example.pathfinder.models.Graph
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 
@@ -48,16 +48,15 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
         }, Paint().apply {
             color = Color.GRAY
             textSize = 18f
-        }, 4f
-        )
+        }, 4f, Graph())
         val vertexFinder = FindUIVertex(60f)
         val edgeFinder = FindUIEdge(45f)
         var mode = 0
         val modes = listOf(
-            AddVertexMode,
-            AddEdgeMode(vertexFinder),
-            RemoveVertexMode(vertexFinder, edgeFinder),
-            SetPriceMode(vertexFinder, edgeFinder)
+			AddVertexMode,
+			AddEdgeMode(vertexFinder),
+			RemoveMode(vertexFinder, edgeFinder),
+			SetPriceMode(vertexFinder, edgeFinder)
         )
         val texts = listOf("Add vertex", "Add edge", "Remove", "Set price")
         binding.graph.touchMode = modes[mode]
@@ -69,7 +68,7 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
                 when (it) {
                     ReadState.ERROR -> makeToast("Error while reading file.")
                     is ReadState.FINISHED -> {
-                        uiGraph.setGraph(it.graph)
+                        uiGraph.graph = it.graph
                         makeToast("Success")
                     }
                     else -> {}
@@ -102,13 +101,13 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	
 		binding.visualize.setOnClickListener {
 			lifecycleScope.launchWhenStarted {
-				Dijkstra(0, uiGraph.vertices.lastIndex, uiGraph._graph).generate().forEach {
+				Dijkstra(uiGraph.vertices.keys.first(), uiGraph.vertices.keys.last(), uiGraph.graph).generate().forEach {
 					uiGraph.setGraphStep(it, algoPaint)
 					Log.d("Debug141", "onViewCreated: $it")
 					binding.graph.invalidate()
 					delay(1000)
 				}
-				uiGraph.clearGraph()
+				uiGraph.resetGraphPaint()
 				binding.graph.invalidate()
 			}
 		}
