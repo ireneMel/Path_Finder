@@ -1,4 +1,4 @@
-package com.example.pathfinder
+package com.example.pathfinder.fragments
 
 import android.graphics.Paint
 import android.os.Bundle
@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
+import com.example.pathfinder.R
 import com.example.pathfinder.core.AlgoPaint
 import com.example.pathfinder.core.FindUIEdge
 import com.example.pathfinder.core.FindUIVertex

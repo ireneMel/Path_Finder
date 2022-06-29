@@ -1,4 +1,4 @@
-package com.example.pathfinder
+package com.example.pathfinder.fragments
 
 import android.os.Bundle
 import android.view.Menu
@@ -12,7 +12,8 @@ import com.codertainment.materialintro.MaterialIntroConfiguration
 import com.codertainment.materialintro.sequence.SkipLocation
 import com.codertainment.materialintro.shape.ShapeType
 import com.codertainment.materialintro.utils.materialIntroSequence
-import com.example.pathfinder.customization.CustomizationFragment
+import com.example.pathfinder.R
+import com.example.pathfinder.dialogs.CustomizationFragment
 import com.example.pathfinder.databinding.FragmentMainBinding
 
 class MainFragment : Fragment(R.layout.fragment_main) {

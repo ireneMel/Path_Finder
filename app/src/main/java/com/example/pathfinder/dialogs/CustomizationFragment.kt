@@ -1,4 +1,4 @@
-package com.example.pathfinder.customization
+package com.example.pathfinder.dialogs
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat.recreate
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.pathfinder.customization.ThemeClickListener
+import com.example.pathfinder.customization.ThemeManager
 import com.example.pathfinder.customization.ThemeStorage.Companion.getThemeColor
 import com.example.pathfinder.customization.ThemeStorage.Companion.saveThemeColor
 import com.example.pathfinder.customization.recyclerview.DataSource

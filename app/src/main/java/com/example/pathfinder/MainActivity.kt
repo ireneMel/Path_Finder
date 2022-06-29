@@ -1,12 +1,11 @@
 package com.example.pathfinder
 
 import android.os.Bundle
-import android.text.TextUtils.replace
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.commit
 import com.example.pathfinder.customization.ThemeManager
 import com.example.pathfinder.customization.ThemeStorage
+import com.example.pathfinder.fragments.MainFragment
 
 class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
