@@ -3,8 +3,8 @@ package com.example.pathfinder.core.modes
 import android.graphics.PointF
 import android.view.MotionEvent
 import com.example.pathfinder.core.uiGraph.EditUIGraph
-import com.example.pathfinder.core.uiGraph.FindUIEdge
-import com.example.pathfinder.core.uiGraph.FindUIVertex
+import com.example.pathfinder.core.uiGraph.finders.FindUIEdge
+import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
 import com.example.pathfinder.models.Edge
 
 class SetPriceMode(

@@ -16,6 +16,8 @@ import com.example.pathfinder.core.serialization.read.ReadState
 import com.example.pathfinder.core.serialization.write.FileState
 import com.example.pathfinder.core.serialization.write.SaveGraphToFile
 import com.example.pathfinder.core.uiGraph.*
+import com.example.pathfinder.core.uiGraph.finders.FindUIEdge
+import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
 import com.example.pathfinder.databinding.FragmentGraphCreationBinding
 import com.example.pathfinder.dialogs.GetPriceDialog
 import com.example.pathfinder.models.Edge

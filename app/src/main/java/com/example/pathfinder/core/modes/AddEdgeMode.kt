@@ -4,8 +4,7 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import android.view.MotionEvent
 import com.example.pathfinder.core.uiGraph.EditUIGraph
-import com.example.pathfinder.core.uiGraph.FindUIVertex
-import com.example.pathfinder.core.uiGraph.UIGraph
+import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
 import com.example.pathfinder.core.uiGraph.emptyPointF
 
 class AddEdgeMode(private val findUIVertex: FindUIVertex, private val graph: EditUIGraph) : TouchMode, DrawMode {
