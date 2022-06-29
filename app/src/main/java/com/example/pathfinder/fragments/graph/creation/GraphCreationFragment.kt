@@ -1,4 +1,4 @@
-package com.example.pathfinder.fragments.creation
+package com.example.pathfinder.fragments.graph.creation
 
 import android.graphics.Paint
 import android.os.Bundle
@@ -19,6 +19,7 @@ import com.example.pathfinder.core.uiGraph.GraphDesign
 import com.example.pathfinder.core.uiGraph.UIVertexDesign
 import com.example.pathfinder.databinding.FragmentGraphCreationBinding
 import com.example.pathfinder.dialogs.GetPriceDialog
+import com.example.pathfinder.fragments.graph.GraphFragment
 import com.example.pathfinder.utils.getThemeColor
 import kotlinx.coroutines.flow.collect
 import kotlin.coroutines.resume
@@ -38,64 +39,15 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		 * @return A new instance of fragment
 		 */
 		@JvmStatic
-		fun newInstance(isOpenClicked: Boolean) =
-			GraphCreationFragment().apply {
-				arguments = Bundle().apply {
-					putBoolean(OPEN_CLICKED, isOpenClicked)
-				}
+		fun newInstance(isOpenClicked: Boolean) = GraphCreationFragment().apply {
+			arguments = Bundle().apply {
+				putBoolean(OPEN_CLICKED, isOpenClicked)
 			}
+		}
 	}
-	
-	private fun getPaint(color: Int, strokeWidth: Float? = null) = Paint().apply {
-		this.color = color
-		if (strokeWidth != null) this.strokeWidth = strokeWidth
-	}
-	
-	private val primaryColor by lazy(LazyThreadSafetyMode.NONE) { getThemeColor(com.google.android.material.R.attr.colorPrimary) }
-	private val primaryVariantColor by lazy(LazyThreadSafetyMode.NONE) { getThemeColor(com.google.android.material.R.attr.colorPrimaryVariant) }
-	private val onPrimaryColor by lazy(LazyThreadSafetyMode.NONE) { getThemeColor(com.google.android.material.R.attr.colorOnPrimary) }
-	private val secondaryColor by lazy(LazyThreadSafetyMode.NONE) { getThemeColor(com.google.android.material.R.attr.colorSecondary) }
-	private val secondaryVariantColor by lazy(LazyThreadSafetyMode.NONE) {
-		getThemeColor(com.google.android.material.R.attr.colorSecondaryVariant)
-	}
-	
-	private val _1dp by lazy(LazyThreadSafetyMode.NONE) { resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT }
-	private val defaultVertexDesign by lazy(LazyThreadSafetyMode.NONE) {
-		UIVertexDesign(
-			radius = 16 * _1dp,
-			paint = getPaint(primaryColor),
-			strokePaint = getPaint(primaryVariantColor, 3 * _1dp)
-		)
-	}
-	
-	private fun getDesign(): GraphDesign {
-		return GraphDesign(
-			defaultVertexDesign,
-			defaultVertexDesign.strokePaint,
-			Paint().apply { color = onPrimaryColor; textSize = 12 * _1dp },
-			3 * _1dp
-		)
-	}
-	
-	private fun getAlgoDesign(): AlgoDesign {
-		val usedColor = getPaint(getThemeColor(androidx.appcompat.R.attr.colorAccent), 3 * _1dp)
-		val currentFillColor = getPaint(secondaryColor)
-		val currentStrokeColor = getPaint(secondaryVariantColor, 3 * _1dp)
-		
-		return AlgoDesign(
-			startDesign = defaultVertexDesign,
-			endDesign = defaultVertexDesign,
-			usedDesign = defaultVertexDesign.copy(strokePaint = usedColor),
-			currentDesign = defaultVertexDesign.copy(
-				paint = currentFillColor, strokePaint = currentStrokeColor
-			),
-			usedEdgePaint = usedColor,
-			currentEdgePaint = currentStrokeColor
-		)
-	}
-	
+
 	private val viewModel: GraphCreationViewModel by viewModels {
-		GraphCreationViewModel.Factory(getDesign())
+		GraphCreationViewModel.Factory((requireParentFragment() as GraphFragment).viewModel)
 	}
 	
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,11 +58,11 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 			viewModel.state.collect(::bindState)
 		}
 		
-		with(binding){
-			addVertex.setOnClickListener { viewModel.setEditState(EditState.ADD_VERTEX) }
-			addEdge.setOnClickListener { viewModel.setEditState(EditState.ADD_EDGE) }
-			setPrice.setOnClickListener { viewModel.setEditState(EditState.SET) }
-			remove.setOnClickListener { viewModel.setEditState(EditState.REMOVE) }
+		with(binding) {
+			addVertex.setOnClickListener { viewModel.setEditState(Action.ADD_VERTEX) }
+			addEdge.setOnClickListener { viewModel.setEditState(Action.ADD_EDGE) }
+			setPrice.setOnClickListener { viewModel.setEditState(Action.SET) }
+			remove.setOnClickListener { viewModel.setEditState(Action.REMOVE) }
 			open.setOnClickListener { graphReader.openFile() }
 			save.setOnClickListener {
 				val graph = binding.graph.graph
@@ -120,8 +72,7 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 					makeToast("The canvas must not be empty")
 				}
 			}
-		}
-		//load graph when corresponding button was clicked
+		}		//load graph when corresponding button was clicked
 		if (requireArguments().getBoolean(OPEN_CLICKED)) {
 			graphReader.openFile()
 			requireArguments().putBoolean(OPEN_CLICKED, false)
@@ -152,7 +103,7 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		}
 	}
 	
-	private suspend fun bindState(state: State){
+	private suspend fun bindState(state: State) {
 		with(binding.graph) {
 			drawMode = state.combinedMode
 			touchMode = state.combinedMode
@@ -160,7 +111,7 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 				graph = state.uiGraph
 			}
 		}
-		if (state is State.SetPrice){
+		if (state is State.SetPrice) {
 			viewModel.setPrice(getPrice())
 		}
 	}

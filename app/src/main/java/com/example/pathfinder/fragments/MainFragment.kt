@@ -14,7 +14,8 @@ import com.codertainment.materialintro.shape.ShapeType
 import com.codertainment.materialintro.utils.materialIntroSequence
 import com.example.pathfinder.R
 import com.example.pathfinder.databinding.FragmentMainBinding
-import com.example.pathfinder.fragments.creation.GraphCreationFragment
+import com.example.pathfinder.fragments.graph.GraphFragment
+import com.example.pathfinder.fragments.graph.creation.GraphCreationFragment
 
 class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var binding: FragmentMainBinding
@@ -26,7 +27,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         binding.createButton.setOnClickListener {
             parentFragmentManager.commit {
-                replace(R.id.container, GraphCreationFragment.newInstance(false))
+                replace(R.id.container, GraphFragment.newInstance(false))
                 addToBackStack(null)
             }
         }
@@ -34,7 +35,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         //load data from the file
         binding.loadButton.setOnClickListener {
             parentFragmentManager.commit {
-                replace(R.id.container, GraphCreationFragment.newInstance(true))
+                replace(R.id.container, GraphFragment.newInstance(true))
                 addToBackStack(null)
             }
         }
