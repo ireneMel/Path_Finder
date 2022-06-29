@@ -43,4 +43,8 @@ class GraphView @JvmOverloads constructor(
 		} else super.onTouchEvent(event)
 	}
 	
+	fun updateGraph(){
+		invalidate()
+	}
+	
 }

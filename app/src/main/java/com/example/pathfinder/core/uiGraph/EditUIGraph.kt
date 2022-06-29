@@ -1,21 +1,17 @@
 package com.example.pathfinder.core.uiGraph
 
-import android.graphics.Paint
 import android.graphics.PointF
 import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Graph
 import com.example.pathfinder.models.Vertex
 
 class EditUIGraph(
-	vertexDesign: UIVertexDesign,
-	edgeStrokePaint: Paint,
-	textPaint: Paint,
-	textPadding: Float,
+	design: GraphDesign,
 	graph: Graph,
 	width: Float = 1f,
 	height: Float = 1f,
 ) : UIGraph(
-	vertexDesign, edgeStrokePaint, textPaint, textPadding, graph, width, height
+	design, graph, width, height
 ) {
 	fun addVertex(position: PointF) {
 		position.x *= width
@@ -25,11 +21,12 @@ class EditUIGraph(
 	
 	fun addVertexWithLocalSize(position: PointF) {
 		val index = graph.addVertex(Vertex(PointF(position.x / width, position.y / height)))
-		_vertices[index] = UIVertex(position, vertexDesign, "", textPaint)
+		_vertices[index] = UIVertex(position, design.vertexDesign, "", design.textPaint)
 	}
 	
 	fun addEdge(from: Int, to: Int) {
-		_edges[Edge(from, to)] = UIEdge(from, to, edgeStrokePaint, "", textPaint, textPadding)
+		_edges[Edge(from, to)] =
+			UIEdge(from, to, design.edgeStrokePaint, "", design.textPaint, design.textPadding)
 		graph.addEdge(from, to)
 	}
 	
@@ -37,11 +34,11 @@ class EditUIGraph(
 		_vertices.remove(index)
 		graph.vertices.remove(index)
 		
-		for ((from, _) in graph.reversedEdges[index]?:return) {
+		for ((from, _) in graph.reversedEdges[index] ?: return) {
 			graph.edges[from]?.remove(index)
 			_edges.remove(Edge(from, index))
 		}
-		for ((to, _) in graph.edges[index]?:return) {
+		for ((to, _) in graph.edges[index] ?: return) {
 			graph.reversedEdges[to]?.remove(index)
 			_edges.remove(Edge(index, to))
 		}

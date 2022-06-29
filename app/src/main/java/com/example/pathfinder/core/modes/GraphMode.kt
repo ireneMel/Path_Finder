@@ -11,3 +11,5 @@ interface DrawMode {
 interface TouchMode {
 	fun onTouch(event: MotionEvent): Boolean
 }
+
+interface CombinedMode : DrawMode, TouchMode

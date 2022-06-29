@@ -4,10 +4,10 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import android.view.MotionEvent
 import com.example.pathfinder.core.uiGraph.EditUIGraph
-import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
 import com.example.pathfinder.core.uiGraph.emptyPointF
+import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
 
-class AddEdgeMode(private val findUIVertex: FindUIVertex, private val graph: EditUIGraph) : TouchMode, DrawMode {
+class AddEdgeMode(private val findUIVertex: FindUIVertex, private val graph: EditUIGraph) : CombinedMode {
 	private var startIndex: Int = -1
 	private val startPosition = PointF()
 	private var end = emptyPointF
@@ -50,7 +50,7 @@ class AddEdgeMode(private val findUIVertex: FindUIVertex, private val graph: Edi
 	override fun onDraw(canvas: Canvas) {
 		if (startIndex != -1 && end != emptyPointF) {
 			canvas.drawLine(
-				startPosition.x, startPosition.y, end.x, end.y, graph.edgeStrokePaint
+				startPosition.x, startPosition.y, end.x, end.y, graph.design.edgeStrokePaint
 			)
 		}
 		defaultDrawMode.onDraw(canvas)

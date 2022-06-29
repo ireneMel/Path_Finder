@@ -1,20 +1,16 @@
 package com.example.pathfinder.core.uiGraph
 
-import android.graphics.Paint
 import com.example.pathfinder.core.algorithms.GraphStep
 import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Graph
 
 class PlayAlgoUIGraph(
-	vertexDesign: UIVertexDesign,
-	edgeStrokePaint: Paint,
-	textPaint: Paint,
-	textPadding: Float,
+	design: GraphDesign,
 	graph: Graph,
 	width: Float = 1f,
 	height: Float = 1f,
 ) : UIGraph(
-	vertexDesign, edgeStrokePaint, textPaint, textPadding, graph, width, height
+	design, graph, width, height
 ) {
 	fun setGraphStep(graphStep: GraphStep, algoDesign: AlgoDesign) {
 		graphStep.start.forEach {
@@ -42,10 +38,10 @@ class PlayAlgoUIGraph(
 	
 	fun resetGraphPaint() {
 		_vertices.values.forEach {
-			it.design = vertexDesign
+			it.design = design.vertexDesign
 		}
 		_edges.values.forEach {
-			it.strokePaint = edgeStrokePaint
+			it.strokePaint = design.edgeStrokePaint
 		}
 	}
 }

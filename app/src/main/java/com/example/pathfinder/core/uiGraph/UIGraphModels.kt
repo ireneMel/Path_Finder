@@ -58,21 +58,25 @@ data class AlgoDesign(
 	}
 }
 
-abstract class UIGraph(
+data class GraphDesign(
 	val vertexDesign: UIVertexDesign,
 	val edgeStrokePaint: Paint,
 	val textPaint: Paint,
 	val textPadding: Float,
-	graph: Graph,
-	protected var width: Float = 1f,
-	protected var height: Float = 1f,
-) {
+){
 	init {
 		edgeStrokePaint.style = Paint.Style.STROKE
 		textPaint.isAntiAlias = true
 		textPaint.textAlign = Paint.Align.CENTER
 	}
-	
+}
+
+abstract class UIGraph(
+	val design: GraphDesign,
+	graph: Graph,
+	protected var width: Float = 1f,
+	protected var height: Float = 1f,
+) {
 	protected data class UIVertex(
 		override val position: PointF,
 		override var design: UIVertexDesign,
@@ -114,9 +118,9 @@ abstract class UIGraph(
 	private fun Vertex.toUI(id: Int): UIVertex {
 		return UIVertex(
 			position = PointF(position.x * width, position.y * height),
-			design = vertexDesign,
+			design = design.vertexDesign,
 			text = if (cost.isNaN()) "" else cost.toString(),
-			textPaint = textPaint
+			textPaint = design.textPaint
 		)
 	}
 	
@@ -124,10 +128,10 @@ abstract class UIGraph(
 		return UIEdge(
 			from = from,
 			to = to,
-			strokePaint = edgeStrokePaint,
+			strokePaint = design.edgeStrokePaint,
 			text = if (cost.isNaN()) "" else cost.toString(),
-			textPaint = textPaint,
-			textPadding = textPadding
+			textPaint = design.textPaint,
+			textPadding = design.textPadding
 		)
 	}
 	
@@ -152,6 +156,7 @@ abstract class UIGraph(
 	}
 	
 	fun resize(width: Float, height: Float) {
+		if (width == this.width && height == this.height) return
 		val widthScale = width / this.width
 		val heightScale = height / this.height
 		if (widthScale <= 0f || heightScale <= 0f) return

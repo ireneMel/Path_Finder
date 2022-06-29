@@ -12,7 +12,7 @@ import com.codertainment.materialintro.MaterialIntroConfiguration
 import com.codertainment.materialintro.sequence.SkipLocation
 import com.codertainment.materialintro.shape.ShapeType
 import com.codertainment.materialintro.utils.materialIntroSequence
-import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
+import com.example.pathfinder.creation.GraphCreationFragment
 import com.example.pathfinder.customization.CustomizationFragment
 import com.example.pathfinder.databinding.FragmentMainBinding
 
