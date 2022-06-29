@@ -44,7 +44,7 @@ class ThemeListAdapter(
 
     private fun configureColors(item: ThemeModel, cardView: CardView) {
         when (item.themeName) {
-            ThemeNames.BASIC -> setColor(R.color.purple_200, cardView)
+            ThemeNames.BASIC -> setColor(R.color.green_200, cardView)
             ThemeNames.SEA -> setColor(R.color.blue, cardView)
             ThemeNames.SPRING -> setColor(R.color.green, cardView)
             ThemeNames.GRAPE -> setColor(R.color.light_pink, cardView)

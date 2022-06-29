@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--  basic  theme-->
+    <color name="green_200">#ADB5AA</color>
+    <color name="green_400">#798774</color>
+    <color name="green_600">#61705a</color>
+    <color name="green_800">#1C221A</color>
+
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>

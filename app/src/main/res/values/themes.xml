@@ -2,12 +2,12 @@
     <!-- Base application theme. -->
     <style name="Theme.PathFinder" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">#ADB5AA</item>
-        <item name="colorPrimaryVariant">#798774</item>
+        <item name="colorPrimary">@color/green_200</item>
+        <item name="colorPrimaryVariant">@color/green_400</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">#61705a</item>
-        <item name="colorSecondaryVariant">#1C221A</item>
+        <item name="colorSecondary">@color/green_600</item>
+        <item name="colorSecondaryVariant">@color/green_800</item>
         <item name="colorOnSecondary">@color/white</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
@@ -40,38 +40,41 @@
         <item name="android:padding">8dp</item>
     </style>
 
-    <style name="Spring" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Spring" parent="Theme.PathFinder">
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryVariant">@color/spring_violet</item>
         <item name="colorOnPrimary">@color/black</item>
         <item name="colorSecondary">@color/light_violet</item>
         <item name="colorSecondaryVariant">@color/light_blue</item>
+        <item name="android:statusBarColor">@color/spring_violet</item>
     </style>
 
-    <style name="Grape" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Grape" parent="Theme.PathFinder">
         <item name="colorPrimary">#795E76</item>
         <item name="colorPrimaryVariant">#967588</item>
         <item name="colorSecondary">#2B3146</item>
         <item name="colorSecondaryVariant">#1B233E</item>
         <item name="colorOnSecondary">@color/white</item>
-<!--        <item name="android:statusBarColor">#2B3146</item>-->
+        <item name="android:statusBarColor">#967588</item>
     </style>
 
-    <style name="Sea" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Sea" parent="Theme.PathFinder">
         <item name="colorPrimary">@color/blue</item>
         <item name="colorPrimaryVariant">@color/blue_variant</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/dark_blue</item>
         <item name="colorSecondaryVariant">@color/dark_blue_variant</item>
         <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor">@color/blue_variant</item>
     </style>
 
-    <style name="Dracula" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Dracula" parent="Theme.PathFinder">
         <item name="colorPrimary">@color/red</item>
         <item name="colorPrimaryVariant">@color/red_variant</item>
         <item name="colorSecondary">@color/dark_red</item>
         <item name="colorSecondaryVariant">@color/dracula_secondary_variant</item>
         <item name="colorOnSecondary">@color/dracula_on_secondary</item>
+        <item name="android:statusBarColor">@color/red_variant</item>
     </style>
 
 </resources>

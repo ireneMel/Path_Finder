@@ -174,17 +174,18 @@ class UIGraph(
 	
 	fun addEdge(from: Int, to: Int) { _edges[Edge(from, to)] = UIEdge(from, to, edgeStrokePaint, "", textPaint, textPadding)
 		graph.addEdge(from, to)
+		graph.addEdge(to, from)
 	}
 	
 	fun removeVertex(index: Int) {
 		_vertices.remove(index)
 		graph.vertices.remove(index)
 		
-		for ((from, _) in graph.reversedEdges[index]!!) {
+		for ((from, _) in graph.reversedEdges[index]?:return) {
 			graph.edges[from]?.remove(index)
 			_edges.remove(Edge(from, index))
 		}
-		for ((to, _) in graph.edges[index]!!) {
+		for ((to, _) in graph.edges[index]?:return) {
 			graph.reversedEdges[to]?.remove(index)
 			_edges.remove(Edge(index, to))
 		}

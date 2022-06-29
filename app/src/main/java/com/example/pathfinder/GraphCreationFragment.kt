@@ -61,7 +61,7 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 			vertexPaint = fillColor,
 			vertexStrokePaint = strokeColor,
 			edgeStrokePaint = strokeColor,
-			textPaint = Paint().apply { color = onPrimaryColor; textSize = 12 * _1dp },
+			textPaint = Paint().apply { color = Color.GRAY; textSize = 12 * _1dp },
 			textPadding = 3 * _1dp,
 			graph = Graph()
 		)

@@ -19,14 +19,6 @@ class CustomizationFragment : Fragment() {
     private lateinit var themeAdapter: ThemeListAdapter
     private lateinit var binding: FragmentCustomizationBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        getThemeColor(requireContext())?.let {
-            ThemeManager.setCustomTheme(requireContext(), it)
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,7 +46,7 @@ class CustomizationFragment : Fragment() {
                 return
             }
             saveThemeColor(requireContext(), chosenColor)
-            ThemeManager.setCustomTheme(requireContext(), chosenColor)
+            ThemeManager.setCustomTheme(requireActivity(), chosenColor)
             recreate(requireActivity())
         }
     }
