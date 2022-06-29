@@ -29,8 +29,16 @@ data class Edge(
 class Graph(
 	val vertices: MutableMap<Int, Vertex> = mutableMapOf(),
 	val edges: MutableMap<Int, MutableMap<Int, Float>> = mutableMapOf(),
-	val reversedEdges: MutableMap<Int, MutableMap<Int, Float>> = mutableMapOf(),
 ){
+	val reversedEdges: MutableMap<Int, MutableMap<Int, Float>> = mutableMapOf()
+	init {
+		for ((from, map) in edges){
+			for ((to, cost) in map){
+				if (reversedEdges[to] == null) reversedEdges[to] = mutableMapOf()
+				reversedEdges[to]!![from] = cost
+			}
+		}
+	}
 	private var freeIndex: Int = (vertices.maxOfOrNull { it.key } ?: -1) + 1
 	fun addVertex(vertex: Vertex): Int{
 		vertices[freeIndex] = vertex
