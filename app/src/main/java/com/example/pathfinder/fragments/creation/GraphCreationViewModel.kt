@@ -1,4 +1,4 @@
-package com.example.pathfinder.creation
+package com.example.pathfinder.fragments.creation
 
 import android.graphics.Canvas
 import android.view.MotionEvent
@@ -10,7 +10,7 @@ import com.example.pathfinder.core.uiGraph.GraphDesign
 import com.example.pathfinder.core.uiGraph.PlayAlgoUIGraph
 import com.example.pathfinder.core.uiGraph.finders.FindUIEdge
 import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
-import com.example.pathfinder.creation.EditState.*
+import com.example.pathfinder.fragments.creation.EditState.*
 import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Graph
 import kotlinx.coroutines.flow.MutableStateFlow

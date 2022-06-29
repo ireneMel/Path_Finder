@@ -1,4 +1,4 @@
-package com.example.pathfinder.creation
+package com.example.pathfinder.fragments.creation
 
 import android.graphics.Paint
 import android.os.Bundle

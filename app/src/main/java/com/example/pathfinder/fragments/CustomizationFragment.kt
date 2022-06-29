@@ -1,4 +1,4 @@
-package com.example.pathfinder.customization
+package com.example.pathfinder.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat.recreate
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.pathfinder.customization.ThemeClickListener
+import com.example.pathfinder.customization.ThemeManager
 import com.example.pathfinder.customization.ThemeStorage.Companion.getThemeColor
 import com.example.pathfinder.customization.ThemeStorage.Companion.saveThemeColor
 import com.example.pathfinder.customization.recyclerview.DataSource
@@ -18,14 +20,6 @@ class CustomizationFragment : Fragment() {
 
     private lateinit var themeAdapter: ThemeListAdapter
     private lateinit var binding: FragmentCustomizationBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        getThemeColor(requireContext())?.let {
-            ThemeManager.setCustomTheme(requireContext(), it)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,7 +48,7 @@ class CustomizationFragment : Fragment() {
                 return
             }
             saveThemeColor(requireContext(), chosenColor)
-            ThemeManager.setCustomTheme(requireContext(), chosenColor)
+            ThemeManager.setCustomTheme(requireActivity(), chosenColor)
             recreate(requireActivity())
         }
     }
