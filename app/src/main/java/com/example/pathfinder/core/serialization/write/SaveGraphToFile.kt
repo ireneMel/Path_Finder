@@ -6,8 +6,7 @@ import android.content.Intent
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.LifecycleOwner
-import com.example.pathfinder.core.UIGraph
-import com.example.pathfinder.models.Edge
+import com.example.pathfinder.core.uiGraph.UIGraph
 import com.example.pathfinder.models.Vertex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

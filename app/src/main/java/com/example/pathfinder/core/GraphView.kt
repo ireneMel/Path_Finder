@@ -2,9 +2,6 @@ package com.example.pathfinder.core
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -12,6 +9,7 @@ import com.example.pathfinder.core.modes.DefaultDrawMode
 import com.example.pathfinder.core.modes.DefaultTouchMode
 import com.example.pathfinder.core.modes.DrawMode
 import com.example.pathfinder.core.modes.TouchMode
+import com.example.pathfinder.core.uiGraph.UIGraph
 
 class GraphView @JvmOverloads constructor(
 	context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -28,22 +26,19 @@ class GraphView @JvmOverloads constructor(
 		graph?.resize(w.toFloat(), h.toFloat())
 	}
 	
-	var drawMode: DrawMode = DefaultDrawMode
+	var drawMode: DrawMode? = null
 	var touchMode: TouchMode = DefaultTouchMode
 	
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		if (canvas == null) return
-		graph?.let {
-			drawMode.onDraw(canvas, it)
-		}
+		drawMode?.onDraw(canvas)
 	}
 	
 	override fun onTouchEvent(event: MotionEvent): Boolean {
-		val ret = graph?.let { touchMode.onTouch(event, it) }
-		return if (ret == true) {
+		val ret = touchMode.onTouch(event)
+		return if (ret) {
 			invalidate()
-		
 			true
 		} else super.onTouchEvent(event)
 	}

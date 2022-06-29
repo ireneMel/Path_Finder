@@ -4,16 +4,17 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import android.graphics.Rect
 import androidx.core.graphics.withRotation
+import com.example.pathfinder.core.uiGraph.*
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
 fun Canvas.drawVertex(vertex: UIVertex) {
-	drawCircle(vertex.position.x, vertex.position.y, vertex.radius, vertex.paint)
+	drawCircle(vertex.position.x, vertex.position.y, vertex.design.radius, vertex.design.paint)
 	drawCircle(
 		vertex.position.x,
 		vertex.position.y,
-		vertex.radius - (vertex.strokePaint.strokeWidth / 2f),
-		vertex.strokePaint
+		vertex.design.radius - (vertex.design.strokePaint.strokeWidth / 2f),
+		vertex.design.strokePaint
 	)
 }
 

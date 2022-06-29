@@ -1,6 +1,5 @@
 package com.example.pathfinder
 
-import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -10,13 +9,13 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
-import com.example.pathfinder.core.*
 import com.example.pathfinder.core.algorithms.Dijkstra
 import com.example.pathfinder.core.modes.*
 import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
 import com.example.pathfinder.core.serialization.read.ReadState
 import com.example.pathfinder.core.serialization.write.FileState
 import com.example.pathfinder.core.serialization.write.SaveGraphToFile
+import com.example.pathfinder.core.uiGraph.*
 import com.example.pathfinder.databinding.FragmentGraphCreationBinding
 import com.example.pathfinder.dialogs.GetPriceDialog
 import com.example.pathfinder.models.Edge
@@ -30,7 +29,7 @@ import kotlin.coroutines.suspendCoroutine
 @Suppress("UNREACHABLE_CODE")
 class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	private lateinit var binding: FragmentGraphCreationBinding
-	private lateinit var uiGraph: UIGraph
+	private lateinit var uiGraph: EditUIGraph
 	
 	companion object {
 		var OPEN_CLICKED = false
@@ -55,11 +54,10 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		val _1dp = resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT
 		val fillColor = getPaint(primaryColor)
 		val strokeColor = getPaint(primaryVariantColor, 3 * _1dp)
+		val defaultVertexDesign = UIVertexDesign(16*_1dp,fillColor, strokeColor)
 		binding = FragmentGraphCreationBinding.bind(view)
-		uiGraph = UIGraph(
-			vertexRadius = 16 * _1dp,
-			vertexPaint = fillColor,
-			vertexStrokePaint = strokeColor,
+		uiGraph = EditUIGraph(
+			vertexDesign = defaultVertexDesign,
 			edgeStrokePaint = strokeColor,
 			textPaint = Paint().apply { color = onPrimaryColor; textSize = 12 * _1dp },
 			textPadding = 3 * _1dp,
@@ -69,14 +67,16 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		val edgeFinder = FindUIEdge(45f)
 		var mode = 0
 		val modes = listOf(
-			AddVertexMode,
-			AddEdgeMode(vertexFinder),
-			RemoveMode(vertexFinder, edgeFinder),
-			SetPriceMode(vertexFinder, edgeFinder, ::onVertexSet, ::onEdgeSet)
+			AddVertexMode(uiGraph),
+			AddEdgeMode(vertexFinder, uiGraph),
+			RemoveMode(vertexFinder, edgeFinder, uiGraph),
+			SetPriceMode(vertexFinder, edgeFinder, uiGraph, ::onVertexSet, ::onEdgeSet)
 		)
 		val texts = listOf("Add vertex", "Add edge", "Remove", "Set price")
+		val drawMode = DefaultDrawMode(uiGraph)
 		binding.graph.touchMode = modes[mode]
 		binding.graph.graph = uiGraph
+		binding.graph.drawMode = drawMode
 		binding.buttonChange.text = texts[mode]
 		
 		lifecycleScope.launchWhenStarted {
@@ -98,30 +98,36 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		
 		val currentStrokeColor = getPaint(secondaryVariantColor, 3*_1dp)
 		
-		val algoPaint = AlgoPaint(
-			startPaint = fillColor,
-			startStrokePaint = strokeColor,
-			endPaint = fillColor,
-			endStrokePaint = strokeColor,
-			usedPaint = fillColor,
-			usedStrokePaint = usedColor,
-			currentPaint = currentFillColor,
-			currentStrokePaint = currentStrokeColor,
+		val algoDesign = AlgoDesign(
+			startDesign = defaultVertexDesign,
+			endDesign = defaultVertexDesign,
+			usedDesign = defaultVertexDesign.copy(strokePaint = usedColor),
+			currentDesign = defaultVertexDesign.copy(paint = currentFillColor, strokePaint = currentStrokeColor),
 			usedEdgePaint = usedColor,
 			currentEdgePaint = currentStrokeColor
 		)
 		
 		binding.visualize.setOnClickListener {
 			lifecycleScope.launchWhenStarted {
+				val graph = PlayAlgoUIGraph(
+					vertexDesign = defaultVertexDesign,
+					edgeStrokePaint = strokeColor,
+					textPaint = Paint().apply { color = onPrimaryColor; textSize = 12 * _1dp },
+					textPadding = 3 * _1dp,
+					graph = uiGraph.graph
+				)
+				binding.graph.graph = graph
+				binding.graph.drawMode = DefaultDrawMode(graph)
+				binding.graph.touchMode = DefaultTouchMode
 				Dijkstra(
-					uiGraph.vertices.keys.first(), uiGraph.vertices.keys.last(), uiGraph.graph
+					graph.vertices.keys.first(), graph.vertices.keys.last(), graph.graph
 				).generate().forEach {
-					uiGraph.setGraphStep(it, algoPaint)
+					graph.setGraphStep(it, algoDesign)
 					Log.d("Debug141", "onViewCreated: $it")
 					binding.graph.invalidate()
 					delay(1000)
 				}
-				uiGraph.resetGraphPaint()
+				graph.resetGraphPaint()
 				binding.graph.invalidate()
 			}
 		}
@@ -140,6 +146,8 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 			binding.buttonChange.text = texts[mode]
 			if (modes[mode] is DrawMode) {
 				binding.graph.drawMode = modes[mode] as DrawMode
+			} else {
+				binding.graph.drawMode = drawMode
 			}
 		}
 		
