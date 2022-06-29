@@ -12,7 +12,6 @@ import com.codertainment.materialintro.MaterialIntroConfiguration
 import com.codertainment.materialintro.sequence.SkipLocation
 import com.codertainment.materialintro.shape.ShapeType
 import com.codertainment.materialintro.utils.materialIntroSequence
-import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
 import com.example.pathfinder.customization.CustomizationFragment
 import com.example.pathfinder.databinding.FragmentMainBinding
 
@@ -33,9 +32,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         //load data from the file
         binding.loadButton.setOnClickListener {
-            GraphCreationFragment.OPEN_CLICKED = true
+            val graphCreationFragment = GraphCreationFragment.newInstance(isOpenClicked = true)
             parentFragmentManager.commit {
-                replace(R.id.container, GraphCreationFragment())
+                replace(R.id.container, graphCreationFragment)
                 addToBackStack(null)
             }
         }
