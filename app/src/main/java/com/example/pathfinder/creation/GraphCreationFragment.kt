@@ -3,7 +3,6 @@ package com.example.pathfinder.creation
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -11,28 +10,41 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.pathfinder.R
-import com.example.pathfinder.core.algorithms.Dijkstra
-import com.example.pathfinder.core.modes.*
 import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
 import com.example.pathfinder.core.serialization.read.ReadState
 import com.example.pathfinder.core.serialization.write.FileState
 import com.example.pathfinder.core.serialization.write.SaveGraphToFile
-import com.example.pathfinder.core.uiGraph.*
-import com.example.pathfinder.core.uiGraph.finders.FindUIEdge
-import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
+import com.example.pathfinder.core.uiGraph.AlgoDesign
+import com.example.pathfinder.core.uiGraph.GraphDesign
+import com.example.pathfinder.core.uiGraph.UIVertexDesign
 import com.example.pathfinder.databinding.FragmentGraphCreationBinding
 import com.example.pathfinder.dialogs.GetPriceDialog
-import com.example.pathfinder.models.Edge
 import com.example.pathfinder.utils.getThemeColor
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-@Suppress("UNREACHABLE_CODE")
+private const val OPEN_CLICKED = "open_clicked"
+
 class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	private lateinit var binding: FragmentGraphCreationBinding
-	private lateinit var uiGraph: EditUIGraph
+	
+	companion object {
+		/**
+		 * Use this factory method to create a new instance of
+		 * this fragment using the provided parameters.
+		 *
+		 * @param isOpenClicked Parameter 1.
+		 * @return A new instance of fragment
+		 */
+		@JvmStatic
+		fun newInstance(isOpenClicked: Boolean) =
+			GraphCreationFragment().apply {
+				arguments = Bundle().apply {
+					putBoolean(OPEN_CLICKED, isOpenClicked)
+				}
+			}
+	}
 	
 	private fun getPaint(color: Int, strokeWidth: Float? = null) = Paint().apply {
 		this.color = color
@@ -67,9 +79,7 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	
 	private fun getAlgoDesign(): AlgoDesign {
 		val usedColor = getPaint(getThemeColor(androidx.appcompat.R.attr.colorAccent), 3 * _1dp)
-		
 		val currentFillColor = getPaint(secondaryColor)
-		
 		val currentStrokeColor = getPaint(secondaryVariantColor, 3 * _1dp)
 		
 		return AlgoDesign(
@@ -88,83 +98,46 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		GraphCreationViewModel.Factory(getDesign())
 	}
 	
-	companion object {
-		var OPEN_CLICKED = false
-	}
-	
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		
-		
 		binding = FragmentGraphCreationBinding.bind(view)
-		val vertexFinder = FindUIVertex(60f)
-		val edgeFinder = FindUIEdge(45f)
-		var mode = 0
-		val modes = listOf(
-			AddVertexMode(uiGraph),
-			AddEdgeMode(vertexFinder, uiGraph),
-			RemoveMode(vertexFinder, edgeFinder, uiGraph),
-			SetPriceMode(vertexFinder, edgeFinder, uiGraph, ::onVertexSet, ::onEdgeSet)
-		)
-		val texts = listOf("Add vertex", "Add edge", "Remove", "Set price")
-		val drawMode = DefaultDrawMode(uiGraph)
-		binding.graph.touchMode = modes[mode]
-		binding.graph.graph = uiGraph
-		binding.graph.drawMode = drawMode
-		binding.buttonChange.text = texts[mode]
+		
+		lifecycleScope.launchWhenStarted {
+			viewModel.state.collect(::bindState)
+		}
+		
+		with(binding){
+			addVertex.setOnClickListener { viewModel.setEditState(EditState.ADD_VERTEX) }
+			addEdge.setOnClickListener { viewModel.setEditState(EditState.ADD_EDGE) }
+			setPrice.setOnClickListener { viewModel.setEditState(EditState.SET) }
+			remove.setOnClickListener { viewModel.setEditState(EditState.REMOVE) }
+			open.setOnClickListener { graphReader.openFile() }
+			save.setOnClickListener {
+				val graph = binding.graph.graph
+				if (graph != null) {
+					graphSaver.createFile(graph)
+				} else {
+					makeToast("The canvas must not be empty")
+				}
+			}
+		}
+		//load graph when corresponding button was clicked
+		if (requireArguments().getBoolean(OPEN_CLICKED)) {
+			graphReader.openFile()
+			requireArguments().putBoolean(OPEN_CLICKED, false)
+		}
+		
 		
 		lifecycleScope.launchWhenStarted {
 			graphReader.state.collect {
 				when (it) {
 					ReadState.ERROR       -> makeToast("Error while reading file.")
 					is ReadState.FINISHED -> {
-						uiGraph.graph = it.graph
+						viewModel.loadGraph(it.graph)
 						makeToast("Success")
 					}
 					else                  -> {}
 				}
-			}
-		}
-		
-		
-		binding.visualize.setOnClickListener {
-			lifecycleScope.launchWhenStarted {
-				val graph = PlayAlgoUIGraph(
-					design = getDesign(),
-					graph = uiGraph.graph
-				)
-				binding.graph.graph = graph
-				binding.graph.drawMode = DefaultDrawMode(graph)
-				binding.graph.touchMode = DefaultTouchMode
-				Dijkstra(
-					graph.vertices.keys.first(), graph.vertices.keys.last(), graph.graph
-				).generate().forEach {
-					graph.setGraphStep(it, getAlgoDesign())
-					Log.d("Debug141", "onViewCreated: $it")
-					binding.graph.invalidate()
-					delay(1000)
-				}
-				graph.resetGraphPaint()
-				binding.graph.invalidate()
-			}
-		}
-		
-		//load graph when corresponding button was clicked
-		if (OPEN_CLICKED) {
-			graphReader.openFile()
-			OPEN_CLICKED = false
-		}
-		
-		binding.open.setOnClickListener { graphReader.openFile() }
-		
-		binding.buttonChange.setOnClickListener {
-			mode = (mode + 1) % modes.size
-			binding.graph.touchMode = modes[mode]
-			binding.buttonChange.text = texts[mode]
-			if (modes[mode] is DrawMode) {
-				binding.graph.drawMode = modes[mode] as DrawMode
-			} else {
-				binding.graph.drawMode = drawMode
 			}
 		}
 		
@@ -177,28 +150,18 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 				}
 			}
 		}
-		binding.save.setOnClickListener {
-			val graph = binding.graph.graph
-			if (graph != null) {
-				graphSaver.createFile(graph)
-			} else {
-				makeToast("The canvas must not be empty")
+	}
+	
+	private suspend fun bindState(state: State){
+		with(binding.graph) {
+			drawMode = state.combinedMode
+			touchMode = state.combinedMode
+			if (state is State.Edit) {
+				graph = state.uiGraph
 			}
 		}
-	}
-	
-	private fun onVertexSet(id: Int) {
-		lifecycleScope.launchWhenStarted {
-			uiGraph.setVertexCost(id, getPrice())
-			binding.graph.invalidate()
-		}
-	}
-	
-	private fun onEdgeSet(edge: Edge) {
-		lifecycleScope.launchWhenStarted {
-			edge.cost = getPrice()
-			uiGraph.setEdgeCost(edge)
-			binding.graph.invalidate()
+		if (state is State.SetPrice){
+			viewModel.setPrice(getPrice())
 		}
 	}
 	

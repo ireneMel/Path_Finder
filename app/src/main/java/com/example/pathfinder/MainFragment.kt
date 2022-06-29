@@ -26,16 +26,15 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         binding.createButton.setOnClickListener {
             parentFragmentManager.commit {
-                replace(R.id.container, GraphCreationFragment())
+                replace(R.id.container, GraphCreationFragment.newInstance(false))
                 addToBackStack(null)
             }
         }
 
         //load data from the file
         binding.loadButton.setOnClickListener {
-            GraphCreationFragment.OPEN_CLICKED = true
             parentFragmentManager.commit {
-                replace(R.id.container, GraphCreationFragment())
+                replace(R.id.container, GraphCreationFragment.newInstance(true))
                 addToBackStack(null)
             }
         }

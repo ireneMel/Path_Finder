@@ -89,6 +89,13 @@ class GraphCreationViewModel(design: GraphDesign) : ViewModel() {
 			state.edge.cost = price
 			editState.uiGraph.setEdgeCost(state.edge)
 		}
+		_state.value = editState
+	}
+	
+	fun loadGraph(graph: Graph){
+		editUIGraph.graph = graph
+		val state = _state.value
+		_state.compareAndSet(state, state)
 	}
 	
 	class Factory(private val design: GraphDesign) : ViewModelProvider.Factory {
