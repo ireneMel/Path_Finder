@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,7 @@ import com.example.pathfinder.core.uiGraph.UIVertexDesign
 import com.example.pathfinder.databinding.FragmentGraphCreationBinding
 import com.example.pathfinder.dialogs.GetPriceDialog
 import com.example.pathfinder.fragments.graph.GraphFragment
+import com.example.pathfinder.fragments.graph.visualization.GraphVisualizationFragment
 import com.example.pathfinder.utils.getThemeColor
 import kotlinx.coroutines.flow.collect
 import kotlin.coroutines.resume
@@ -59,6 +61,12 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		}
 		
 		with(binding) {
+			play.setOnClickListener {
+				parentFragmentManager.commit {
+					replace(R.id.graphContainer,GraphVisualizationFragment())
+					addToBackStack(null)
+				}
+			}
 			addVertex.setOnClickListener { viewModel.setEditState(Action.ADD_VERTEX) }
 			addEdge.setOnClickListener { viewModel.setEditState(Action.ADD_EDGE) }
 			setPrice.setOnClickListener { viewModel.setEditState(Action.SET) }

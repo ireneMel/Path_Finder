@@ -1,5 +1,6 @@
 package com.example.pathfinder.fragments.graph
 
+import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -76,8 +77,8 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 		val currentStrokeColor = getPaint(secondaryVariantColor, 3 * _1dp)
 		
 		return AlgoDesign(
-			startDesign = defaultVertexDesign,
-			endDesign = defaultVertexDesign,
+			startDesign = defaultVertexDesign.copy(strokePaint = getPaint(Color.MAGENTA, 3 * _1dp)),
+			endDesign = defaultVertexDesign.copy(strokePaint = getPaint(Color.WHITE, 3 * _1dp)),
 			usedDesign = defaultVertexDesign.copy(strokePaint = usedColor),
 			currentDesign = defaultVertexDesign.copy(
 				paint = currentFillColor, strokePaint = currentStrokeColor

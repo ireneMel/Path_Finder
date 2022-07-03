@@ -24,7 +24,7 @@ enum class Action {
 	DEFAULT, ADD_VERTEX, ADD_EDGE, REMOVE, SET
 }
 
-class GraphCreationViewModel(graphProvider: GraphProvider) : ViewModel() {
+class GraphCreationViewModel(private var graphProvider: GraphProvider) : ViewModel() {
 	private val uiGraph = EditUIGraph(
 		graphProvider.design, graph = graphProvider.graph
 	)
@@ -77,6 +77,7 @@ class GraphCreationViewModel(graphProvider: GraphProvider) : ViewModel() {
 	
 	fun loadGraph(graph: Graph) {
 		uiGraph.graph = graph
+		graphProvider.graph = graph
 		val state = _state.value
 		_state.compareAndSet(state, state)
 	}

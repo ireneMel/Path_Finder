@@ -73,6 +73,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/play"
+        style="@style/ButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play"
+        app:drawableLeftCompat="@drawable/ic_save"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.helper.widget.Flow
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -81,7 +91,7 @@
         app:flow_verticalGap="16dp"
         android:padding="8dp"
         app:flow_horizontalStyle="spread_inside"
-        app:constraint_referenced_ids="addVertex,addEdge,setPrice,remove,open,save"
+        app:constraint_referenced_ids="addVertex,addEdge,setPrice,remove,open,save,play"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

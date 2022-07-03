@@ -7,14 +7,14 @@ import com.example.pathfinder.core.uiGraph.GraphDesign
 import com.example.pathfinder.models.Graph
 
 interface GraphProvider {
-	val graph: Graph
+	var graph: Graph
 	val design: GraphDesign
 	val algoDesign: AlgoDesign
 }
 
 class GraphViewModel(override val design: GraphDesign, override val algoDesign: AlgoDesign) :
 	ViewModel(), GraphProvider {
-	override val graph = Graph()
+	override var graph = Graph()
 	class Factory(
 		private val design: GraphDesign,
 		private val algoDesign: AlgoDesign,

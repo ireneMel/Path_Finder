@@ -39,7 +39,7 @@ class AddEdgeMode(private val findUIVertex: FindUIVertex, private val graph: Edi
 	
 	private fun endDrag(position: PointF, graph: EditUIGraph) {
 		val endIndex = findUIVertex.findIndex(position, graph)
-		if (startIndex != -1 && endIndex != -1) {
+		if (startIndex != -1 && endIndex != -1 && startIndex != endIndex) {
 			graph.addEdge(startIndex, endIndex)
 		}
 		startIndex = -1

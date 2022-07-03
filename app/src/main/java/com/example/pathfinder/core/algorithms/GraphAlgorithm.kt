@@ -1,6 +1,5 @@
 package com.example.pathfinder.core.algorithms
 
-import com.example.pathfinder.core.algorithms.Dijkstra.GraphState.*
 import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Graph
 import java.util.*
@@ -15,7 +14,7 @@ interface GraphStep {
 }
 
 abstract class GraphAlgorithm(val start: List<Int>, val end: List<Int>, val graph: Graph) {
-	abstract fun generate(): Sequence<GraphStep>
+	abstract fun generate(): List<GraphStep>
 }
 
 class Dijkstra private constructor(start: List<Int>, end: List<Int>, graph: Graph) :
@@ -28,13 +27,20 @@ class Dijkstra private constructor(start: List<Int>, end: List<Int>, graph: Grap
 	
 	private val queue = PriorityQueue<VertexCost>()
 	private val dist: MutableMap<Int, Float> = mutableMapOf()
+	private val cnt: MutableMap<Int, Int> = mutableMapOf()
+	private val ans: MutableMap<Int, MutableList<Int>> = mutableMapOf()
+	private fun addAns(from: Int, to: Int, clear: Boolean) {
+		if (clear) ans[to]?.clear()
+		if (ans[to] == null) ans[to] = mutableListOf()
+		ans[to]?.add(from)
+	}
 	
 	init {
 		runAlgo()
 	}
 	
 	private fun runAlgo() {
-		for ((id, _) in graph.vertices)dist[id] = Float.POSITIVE_INFINITY
+		for ((id, _) in graph.vertices) dist[id] = Float.POSITIVE_INFINITY
 		end.forEach {
 			queue.add(VertexCost(it, 0f))
 			dist[it] = 0f
@@ -44,15 +50,64 @@ class Dijkstra private constructor(start: List<Int>, end: List<Int>, graph: Grap
 		while (queue.isNotEmpty()) {
 			val current = queue.poll() ?: break
 			if (current.cost > dist[current.vertexId]!!) continue
-			for ((to, cost) in graph.reversedEdges[current.vertexId]?:continue) {
+			for ((to, cost) in graph.reversedEdges[current.vertexId] ?: continue) {
 				currentDistance =
 					dist[current.vertexId]!! + graph.vertices[to]!!.cost.nanToZero() + cost.nanToOne()
+				if (currentDistance == dist[to]!!) {
+					addAns(current.vertexId, to, false)
+				}
 				if (currentDistance < dist[to]!!) {
+					addAns(current.vertexId, to, true)
 					dist[to] = currentDistance
 					queue.add(VertexCost(to, dist[to]!!))
 				}
 			}
 		}
+	}
+	
+	override fun generate(): List<GraphStep> {
+		dist.forEach { (to, _) ->
+			cnt[to] = 0
+		}
+		ans.forEach { (_, from) ->
+			from.forEach {
+				cnt[it] = cnt[it]!! + 1
+			}
+		}
+		var step = GraphStepImpl(start, end, start, emptyList(), emptyList(), emptyList())
+		val list = mutableListOf(step)
+		while (step.currentVertices.isNotEmpty()) {
+			val newVertices = mutableSetOf<Int>()
+			val newEdges = mutableListOf<Edge>()
+			val usedVertices = mutableListOf<Int>()
+			val usedEdges = mutableListOf<Edge>()
+			usedVertices.addAll(step.usedVertices)
+			usedEdges.addAll(step.usedEdges)
+			step.currentVertices.forEach { current ->
+				if (cnt[current] == 0) {
+					usedVertices.add(current)
+					ans[current]?.forEach {
+						cnt[it] = cnt[it]!! - 1
+						newVertices.add(it)
+						newEdges.add(Edge(current, it))
+					}
+				} else {
+					newVertices.add(current)
+				}
+			}
+			step.currentEdges.forEach {
+				if (newVertices.contains(it.to)) newEdges.add(it)
+				else usedEdges.add(it)
+			}
+			step = step.copy(
+				currentVertices = newVertices.toList(),
+				currentEdges = newEdges,
+				usedVertices = usedVertices,
+				usedEdges = usedEdges
+			)
+			list.add(step)
+		}
+		return list
 	}
 	
 	private fun Float.nanToZero() = if (this.isNaN()) 0f else this
@@ -66,73 +121,4 @@ class Dijkstra private constructor(start: List<Int>, end: List<Int>, graph: Grap
 		override val usedVertices: List<Int>,
 		override val usedEdges: List<Edge>
 	) : GraphStep
-	
-	private val usedVertices = hashSetOf<Int>()
-	private val usedEdges = hashSetOf<Edge>()
-	private val newVertices = hashSetOf<Int>()
-	private val newEdges = hashSetOf<Edge>()
-	
-	private fun GraphStepImpl.next(): GraphStepImpl {
-		newVertices.clear()
-		newEdges.clear()
-		
-		val minDist = currentVertices.minOf {
-			graph.edges[it]?.minOfOrNull { dist[it.key]!! } ?: Float.POSITIVE_INFINITY
-		}
-		
-		for (from in currentVertices) {
-			for ((to, cost) in graph.edges[from]?:continue) {
-				if (minDist == dist[to]) {
-					newVertices.add(to)
-					newEdges.add(Edge(from, to, cost))
-				}
-			}
-		}
-		
-		this@Dijkstra.usedVertices.addAll(currentVertices)
-		this@Dijkstra.usedEdges.addAll(currentEdges)
-		
-		return GraphStepImpl(
-			start,
-			end,
-			newVertices.toList(),
-			newEdges.toList(),
-			this@Dijkstra.usedVertices.toList(),
-			this@Dijkstra.usedEdges.toList()
-		)
-	}
-	
-	private enum class GraphState {
-		FIRST, MIDDLE, LAST, END
-	}
-	
-	override fun generate(): Sequence<GraphStep> {
-		if (start.all { dist[it] == Float.POSITIVE_INFINITY }) return emptySequence()
-		var state = FIRST
-		var currentState =
-			GraphStepImpl(start, end, emptyList(), emptyList(), emptyList(), emptyList())
-		return generateSequence {
-			if (state == END) return@generateSequence null
-			val ret = currentState
-			if (state == FIRST) currentState =
-				GraphStepImpl(start, end, start, emptyList(), emptyList(), emptyList())
-			if (state == MIDDLE) currentState = currentState.next()
-			
-			state = when (state) {
-				FIRST -> MIDDLE
-				MIDDLE -> if (currentState.usedVertices.any { end.contains(it) }) LAST else MIDDLE
-				LAST -> END
-				else -> error("Unexpected state")
-			}
-			if (state == LAST) currentState = GraphStepImpl(
-				start,
-				end,
-				emptyList(),
-				emptyList(),
-				currentState.usedVertices,
-				currentState.usedEdges
-			)
-			ret
-		}
-	}
 }

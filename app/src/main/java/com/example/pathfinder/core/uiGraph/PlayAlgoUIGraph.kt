@@ -13,14 +13,14 @@ class PlayAlgoUIGraph(
 	design, graph, width, height
 ) {
 	fun setGraphStep(graphStep: GraphStep, algoDesign: AlgoDesign) {
+		graphStep.usedVertices.forEach {
+			_vertices[it]?.design = algoDesign.usedDesign
+		}
 		graphStep.start.forEach {
 			_vertices[it]?.design = algoDesign.startDesign
 		}
 		graphStep.end.forEach {
 			_vertices[it]?.design = algoDesign.endDesign
-		}
-		graphStep.usedVertices.forEach {
-			_vertices[it]?.design = algoDesign.usedDesign
 		}
 		graphStep.currentVertices.forEach {
 			_vertices[it]?.design = algoDesign.currentDesign
@@ -34,6 +34,18 @@ class PlayAlgoUIGraph(
 			_edges[Edge(currentEdge.to, currentEdge.from)]?.strokePaint =
 				algoDesign.currentEdgePaint
 		}
+	}
+	
+	fun resetVertex(id: Int){
+		_vertices[id]?.design = design.vertexDesign
+	}
+	
+	fun setVertexStart(id: Int, startDesign: UIVertexDesign){
+		_vertices[id]?.design = startDesign
+	}
+	
+	fun setVertexEnd(id: Int, endDesign: UIVertexDesign){
+		_vertices[id]?.design = endDesign
 	}
 	
 	fun resetGraphPaint() {
