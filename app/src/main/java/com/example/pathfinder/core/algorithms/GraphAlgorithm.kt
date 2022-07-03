@@ -35,8 +35,11 @@ class Dijkstra private constructor(start: List<Int>, end: List<Int>, graph: Grap
 		ans[to]?.add(from)
 	}
 	
+	val pathCost: Float
+	
 	init {
 		runAlgo()
+		pathCost = start.minOf { dist[it]!! }
 	}
 	
 	private fun runAlgo() {

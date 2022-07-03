@@ -50,6 +50,10 @@ class GraphVisualizationFragment : Fragment(R.layout.fragment_graph_visualizatio
 		selectEnd.isVisible = isSelecting
 		previous.isVisible = !isSelecting
 		next.isVisible = !isSelecting
+		textInfo.isVisible = !isSelecting
+		
+		if(!isSelecting)
+			textInfo.text = "Shortest path cost is ${(state as State.ShowStep).cost}"
 		
 		graph.graph = state.uiGraph
 		graph.touchMode = state.combinedMode

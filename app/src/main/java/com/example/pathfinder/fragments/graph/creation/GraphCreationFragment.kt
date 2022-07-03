@@ -1,28 +1,20 @@
 package com.example.pathfinder.fragments.graph.creation
 
-import android.graphics.Paint
 import android.os.Bundle
-import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
-import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
 import androidx.lifecycle.lifecycleScope
 import com.example.pathfinder.R
 import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
 import com.example.pathfinder.core.serialization.read.ReadState
 import com.example.pathfinder.core.serialization.write.FileState
 import com.example.pathfinder.core.serialization.write.SaveGraphToFile
-import com.example.pathfinder.core.uiGraph.AlgoDesign
-import com.example.pathfinder.core.uiGraph.GraphDesign
-import com.example.pathfinder.core.uiGraph.UIVertexDesign
 import com.example.pathfinder.databinding.FragmentGraphCreationBinding
 import com.example.pathfinder.dialogs.GetPriceDialog
 import com.example.pathfinder.fragments.graph.GraphFragment
 import com.example.pathfinder.fragments.graph.visualization.GraphVisualizationFragment
-import com.example.pathfinder.utils.getThemeColor
 import kotlinx.coroutines.flow.collect
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -63,7 +55,7 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		with(binding) {
 			play.setOnClickListener {
 				parentFragmentManager.commit {
-					replace(R.id.graphContainer,GraphVisualizationFragment())
+					add(R.id.graphContainer,GraphVisualizationFragment())
 					addToBackStack(null)
 				}
 			}

@@ -91,6 +91,7 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		binding = FragmentGraphBinding.bind(view)
+		if (savedInstanceState == null)
 		childFragmentManager.commit {
 			replace(
 				R.id.graphContainer, GraphCreationFragment.newInstance(

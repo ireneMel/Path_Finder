@@ -27,7 +27,7 @@ sealed class State(val uiGraph: PlayAlgoUIGraph, val combinedMode: CombinedMode)
 	class SelectEndVertex(uiGraph: PlayAlgoUIGraph, combinedMode: CombinedMode) :
 		SelectVertex(uiGraph, combinedMode)
 	
-	class ShowStep(uiGraph: PlayAlgoUIGraph, combinedMode: CombinedMode) :
+	class ShowStep(val cost: Float, uiGraph: PlayAlgoUIGraph, combinedMode: CombinedMode) :
 		State(uiGraph, combinedMode)
 }
 
@@ -68,7 +68,7 @@ class GraphVisualizationViewModel(
 				uiGraph.resetGraphPaint()
 				pause()
 				uiGraph.setGraphStep(generatedSteps[currentStep], design)
-				_state.value = State.ShowStep(uiGraph, getModes(action))
+				_state.value = State.ShowStep(cost, uiGraph, getModes(action))
 			}
 			else                -> {}
 		}
@@ -101,22 +101,28 @@ class GraphVisualizationViewModel(
 	private var generatedSteps = emptyList<GraphStep>()
 	private var currentStep = -1
 	private var playJob: Job? = null
+	private var cost: Float = 0f
 	
 	private fun setup(): Boolean {
-		if (startVertex == -1 || endVertex == -1) return false
-		if (currentStep == -1) generatedSteps =
-			Dijkstra(startVertex, endVertex, graphProvider.graph).generate()
+		if (startVertex == -1 || endVertex == -1 || startVertex == endVertex) return false
+		if (currentStep == -1) {
+			val dijkstra = Dijkstra(startVertex, endVertex, graphProvider.graph)
+			generatedSteps = dijkstra.generate()
+			cost = dijkstra.pathCost
+		}
 		return true
 	}
 	
 	val isPlaying get() = playJob != null
 	
 	private fun play() {
-		if (currentStep == -1) setup()
+		if (currentStep == -1) {
+			if (!setup()) return
+		}
 		playJob = viewModelScope.launch {
 			while (true) {
 				uiGraph.setGraphStep(nextStep() ?: break, design)
-				_state.value = State.ShowStep(uiGraph, getModes(PLAY))
+				_state.value = State.ShowStep(cost, uiGraph, getModes(PLAY))
 				delay(1000)
 			}
 		}
@@ -128,6 +134,7 @@ class GraphVisualizationViewModel(
 	}
 	
 	private fun clear() {
+		pause()
 		startVertex = -1
 		endVertex = -1
 		currentStep = -1
