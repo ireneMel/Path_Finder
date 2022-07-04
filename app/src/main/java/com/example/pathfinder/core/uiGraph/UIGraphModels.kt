@@ -72,6 +72,8 @@ data class GraphDesign(
 
 		textEdgePaint.isAntiAlias = true
 		textEdgePaint.textAlign = Paint.Align.CENTER
+		
+		textEdgePaint.color = edgeStrokePaint.color
 	}
 }
 

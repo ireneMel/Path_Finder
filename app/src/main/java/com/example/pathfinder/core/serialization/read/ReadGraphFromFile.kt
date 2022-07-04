@@ -58,9 +58,11 @@ class ReadGraphFromFile(
 				val vertices = readVertices(results[0].value)
 				val edges = readEdges(results[1].value)
 				_state.value = ReadState.FINISHED(Graph(vertices, edges))
+				_state.value = ReadState.IDLE
 			}
 		} else {
 			_state.value = ReadState.ERROR
+			_state.value = ReadState.IDLE
 		}
 	}
 	

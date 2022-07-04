@@ -1,10 +1,12 @@
 package com.example.pathfinder.fragments.graph.creation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.pathfinder.core.modes.*
 import com.example.pathfinder.core.uiGraph.BiEditUIGraph
 import com.example.pathfinder.core.uiGraph.EditUIGraph
+import com.example.pathfinder.core.uiGraph.OneEditUIGraph
 import com.example.pathfinder.core.uiGraph.finders.FindUIEdge
 import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
 import com.example.pathfinder.fragments.graph.GraphProvider
@@ -25,8 +27,12 @@ enum class Action {
 	DEFAULT, ADD_VERTEX, ADD_EDGE, REMOVE, SET
 }
 
-class GraphCreationViewModel(private var graphProvider: GraphProvider) : ViewModel() {
-	private val uiGraph = BiEditUIGraph(
+class GraphCreationViewModel(private var graphProvider: GraphProvider, isBiGraph: Boolean) :
+	ViewModel() {
+	
+	private val uiGraph = if (isBiGraph) BiEditUIGraph(
+		graphProvider.design, graph = graphProvider.graph
+	) else OneEditUIGraph(
 		graphProvider.design, graph = graphProvider.graph
 	)
 	private val vertexFinder = FindUIVertex(graphProvider.design.vertexDesign.radius * 2)
@@ -51,6 +57,7 @@ class GraphCreationViewModel(private var graphProvider: GraphProvider) : ViewMod
 	}
 	
 	fun setEditState(state: Action) {
+		Log.d("Debug141", "setEditState: ")
 		_state.value = State.Edit(uiGraph, getModes(state))
 	}
 	
@@ -83,9 +90,9 @@ class GraphCreationViewModel(private var graphProvider: GraphProvider) : ViewMod
 		_state.compareAndSet(state, state)
 	}
 	
-	class Factory(private val graphProvider: GraphProvider) : ViewModelProvider.Factory {
+	class Factory(private val graphProvider: GraphProvider, private val isBiGraph: Boolean) : ViewModelProvider.Factory {
 		override fun <T : ViewModel> create(modelClass: Class<T>): T {
-			return GraphCreationViewModel(graphProvider) as T
+			return GraphCreationViewModel(graphProvider, isBiGraph) as T
 		}
 	}
 }

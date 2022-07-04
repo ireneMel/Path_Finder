@@ -49,9 +49,19 @@ abstract class EditUIGraph(
 	
 	abstract fun addEdge(from: Int, to: Int)
 	
-	abstract fun removeEdge(edge: Edge)
+	fun removeEdge(edge: Edge) {
+		graph.removeEdge(edge.from, edge.to)
+		graph.removeEdge(edge.to, edge.from)
+		_edges.remove(edge)
+		_edges.remove(Edge(from = edge.to, to = edge.from))
+	}
 	
-	abstract fun setEdgeCost(edge: Edge)
+	fun setEdgeCost(edge: Edge) {
+		if (edge.cost.isNaN()) return
+		graph.setCost(edge)
+		graph.setCost(edge.copy(from = edge.to, to = edge.from))
+		_edges[edge]?.text = edge.cost.toString()
+	}
 }
 
 class OneEditUIGraph(
@@ -63,23 +73,19 @@ class OneEditUIGraph(
 	design, graph, width, height
 ) {
 	override fun addEdge(from: Int, to: Int) {
-		_edges[Edge(from, to)] =
-			UIEdge(from, to, design.edgeStrokePaint, "", design.textEdgePaint, design.textPadding)
-		graph.addEdge(from, to)
-	}
-	
-	override fun removeEdge(edge: Edge) {
-		graph.edges[edge.from]?.remove(edge.to)
-		_edges.remove(edge)
-	}
-	
-	override fun setEdgeCost(edge: Edge) {
-		if (edge.cost.isNaN()) return
-		graph.edges[edge.from]!![edge.to] = edge.cost
-		_edges[edge]?.text = edge.cost.toString()
+		val defaultCost = graph.edges[to]?.get(from) ?: Float.NaN
+		
+		_edges[Edge(from, to)] = UIEdge(
+			from = from,
+			to = to,
+			strokePaint = design.edgeStrokePaint,
+			text = if (defaultCost.isNaN()) "" else defaultCost.toString(),
+			textPaint = design.textEdgePaint,
+			textPadding = design.textPadding
+		)
+		graph.addEdge(from, to, defaultCost)
 	}
 }
-
 
 class BiEditUIGraph(
 	design: GraphDesign,
@@ -96,20 +102,5 @@ class BiEditUIGraph(
 			UIEdge(to, from, design.edgeStrokePaint, "", design.textEdgePaint, design.textPadding)
 		graph.addEdge(from, to)
 		graph.addEdge(to, from)
-	}
-	
-	override fun removeEdge(edge: Edge) {
-		graph.edges[edge.from]?.remove(edge.to)
-		graph.edges[edge.to]?.remove(edge.from)
-		_edges.remove(edge)
-		_edges.remove(Edge(from = edge.to, to = edge.from))
-	}
-	
-	override fun setEdgeCost(edge: Edge) {
-		if (edge.cost.isNaN()) return
-		graph.edges[edge.from]!![edge.to] = edge.cost
-		graph.edges[edge.to]!![edge.from] = edge.cost
-		_edges[edge]?.text = edge.cost.toString()
-		_edges[Edge(edge.to, edge.from)]?.text = edge.cost.toString()
 	}
 }

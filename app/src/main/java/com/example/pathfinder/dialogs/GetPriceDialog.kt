@@ -24,7 +24,7 @@ class GetPriceDialog : BottomSheetDialogFragment() {
 		binding = BottomSheetContentBinding.inflate(inflater)
 		binding.doneButton.setOnClickListener { setResult(binding.costInput.text.toString()) }
 		binding.costInput.setOnEditorActionListener { _, event, _ ->
-			if (event == EditorInfo.IME_ACTION_DONE){
+			if (event == EditorInfo.IME_ACTION_DONE) {
 				setResult(binding.costInput.text.toString())
 				true
 			} else {

@@ -22,7 +22,7 @@ class SaveGraphToFile(
 	}
 	
 	private var uiGraph: UIGraph by Delegates.notNull()
-	private val _state = MutableStateFlow(FileState.OPENED)
+	private val _state = MutableStateFlow(FileState.IDLE)
 	val state = _state.asStateFlow()
 	fun createFile(graph: UIGraph) {
 		this.uiGraph = graph
@@ -64,8 +64,10 @@ class SaveGraphToFile(
 				it.write("}".toByteArray())
 			}
 			_state.value = FileState.CLOSED
+			_state.value = FileState.IDLE
 		} else {
 			_state.value = FileState.ERROR
+			_state.value = FileState.IDLE
 		}
 	}
 	

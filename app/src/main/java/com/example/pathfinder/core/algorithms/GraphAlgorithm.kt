@@ -1,8 +1,10 @@
 package com.example.pathfinder.core.algorithms
 
+import android.util.Log
 import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Graph
 import java.util.*
+import kotlin.collections.HashSet
 
 interface GraphStep {
 	val start: List<Int>
@@ -52,6 +54,7 @@ class Dijkstra private constructor(start: List<Int>, end: List<Int>, graph: Grap
 		var currentDistance: Float
 		while (queue.isNotEmpty()) {
 			val current = queue.poll() ?: break
+			if (start.contains(current.vertexId)) break
 			if (current.cost > dist[current.vertexId]!!) continue
 			for ((to, cost) in graph.reversedEdges[current.vertexId] ?: continue) {
 				currentDistance =
@@ -68,18 +71,29 @@ class Dijkstra private constructor(start: List<Int>, end: List<Int>, graph: Grap
 		}
 	}
 	
-	override fun generate(): List<GraphStep> {
-		dist.forEach { (to, _) ->
-			cnt[to] = 0
-		}
-		ans.forEach { (_, from) ->
-			from.forEach {
-				cnt[it] = cnt[it]!! + 1
+	private fun preGenerateUsedVertices() {
+		val set = HashSet<Int>()
+		val queue: Queue<Int> = LinkedList()
+		queue.addAll(start)
+		while (queue.isNotEmpty()) {
+			val current = queue.poll() ?: break
+			set.add(current)
+			ans[current]?.forEach {
+				cnt[it] = (cnt[it] ?: 0) + 1
+				if (set.contains(it).not()) {
+					set.add(it)
+					queue.add(it)
+				}
 			}
 		}
+	}
+	
+	override fun generate(): List<GraphStep> {
+		preGenerateUsedVertices()
 		var step = GraphStepImpl(start, end, start, emptyList(), emptyList(), emptyList())
 		val list = mutableListOf(step)
 		while (step.currentVertices.isNotEmpty()) {
+			Log.d("Debug141", "generate: $step")
 			val newVertices = mutableSetOf<Int>()
 			val newEdges = mutableListOf<Edge>()
 			val usedVertices = mutableListOf<Int>()
@@ -87,7 +101,7 @@ class Dijkstra private constructor(start: List<Int>, end: List<Int>, graph: Grap
 			usedVertices.addAll(step.usedVertices)
 			usedEdges.addAll(step.usedEdges)
 			step.currentVertices.forEach { current ->
-				if (cnt[current] == 0) {
+				if ((cnt[current] ?: 0) == 0) {
 					usedVertices.add(current)
 					ans[current]?.forEach {
 						cnt[it] = cnt[it]!! - 1

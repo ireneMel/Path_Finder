@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Path Finder</string>
-    <string name="create_new_graph">Create new graph</string>
+    <string name="create_new_graph_1">Create new one direction graph</string>
+    <string name="create_new_graph_2">Create new bi direction graph</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="load_from_file">Load from file</string>
     <string name="choose_custom_theme">Choose custom theme</string>

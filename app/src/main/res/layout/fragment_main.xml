@@ -23,9 +23,15 @@
             android:text="@string/app_name"
             android:textColor="?colorOnSecondary" />
         <TextView
-            android:id="@+id/create_button"
+            android:id="@+id/create_one_button"
             style="@style/ButtonStyle"
-            android:text="@string/create_new_graph"
+            android:text="@string/create_new_graph_1"
+            app:drawableLeftCompat="@drawable/ic_add"
+            app:layout_constraintEnd_toEndOf="parent" />
+        <TextView
+            android:id="@+id/create_bi_button"
+            style="@style/ButtonStyle"
+            android:text="@string/create_new_graph_2"
             app:drawableLeftCompat="@drawable/ic_add"
             app:layout_constraintEnd_toEndOf="parent" />
 

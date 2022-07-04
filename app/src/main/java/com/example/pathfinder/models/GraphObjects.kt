@@ -40,14 +40,28 @@ class Graph(
 		}
 	}
 	private var freeIndex: Int = (vertices.maxOfOrNull { it.key } ?: -1) + 1
+	
 	fun addVertex(vertex: Vertex): Int{
 		vertices[freeIndex] = vertex
 		return freeIndex++
 	}
+	
 	fun addEdge(from: Int, to: Int, cost: Float = Float.NaN){
 		if (edges[from] == null)edges[from] = mutableMapOf()
 		if (reversedEdges[to] == null)reversedEdges[to] = mutableMapOf()
 		edges[from]!![to] = cost
 		reversedEdges[to]!![from] = cost
+	}
+	
+	fun removeEdge(from: Int, to: Int){
+		edges[from]?.remove(to)
+		reversedEdges[to]?.remove(from)
+	}
+	
+	fun setCost(edge: Edge){
+		if (edges.contains(edge.from)) {
+			edges[edge.from]!![edge.to] = edge.cost
+			reversedEdges[edge.to]!![edge.from] = edge.cost
+		}
 	}
 }
