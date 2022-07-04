@@ -34,9 +34,9 @@
     <color name="light_blue">#64A8dd</color>
 
     <!--  dracula  theme-->
-    <color name="red">#6A1C1C</color>
-    <color name="red_variant">#431212</color>
-    <color name="dark_red">#2C0404</color>
-    <color name="dracula_secondary_variant">#2C0404</color>
+    <color name="red">#A63B3B</color>
+    <color name="red_variant">#7E2525</color>
+    <color name="dark_red">#500C0C</color>
+    <color name="dracula_secondary_variant">#5A0F0F</color>
     <color name="dracula_on_secondary">#D36666</color>
 </resources>
