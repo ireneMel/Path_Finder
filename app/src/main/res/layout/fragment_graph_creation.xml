@@ -53,26 +53,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--    <com.google.android.material.textview.MaterialTextView-->
-    <!--        android:id="@+id/open"-->
-    <!--        style="@style/ButtonStyle"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:text="Load from file"-->
-    <!--        app:drawableLeftCompat="@drawable/ic_download"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--    <com.google.android.material.textview.MaterialTextView-->
-    <!--        android:id="@+id/save"-->
-    <!--        style="@style/ButtonStyle"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:text="Save to file"-->
-    <!--        app:drawableLeftCompat="@drawable/ic_save"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/play"
         style="@style/ButtonStyle"

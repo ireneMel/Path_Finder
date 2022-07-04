@@ -8,7 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
         <TextView
             android:id="@+id/logo"
             android:layout_width="match_parent"
@@ -19,13 +18,10 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:background="@color/teal_200"
-            android:backgroundTint="?colorSecondary"
+            app:backgroundTint="?colorSecondary"
             android:gravity="center"
             android:text="@string/app_name"
             android:textColor="?colorOnSecondary" />
-
-        <!--android:foreground="?android:attr/selectableItemBackground"-->
-        <!--style="@android:style/Widget.Button"-->
         <TextView
             android:id="@+id/create_button"
             style="@style/ButtonStyle"
@@ -44,13 +40,6 @@
             style="@style/ButtonStyle"
             android:text="@string/choose_custom_theme"
             app:drawableLeftCompat="@drawable/ic_theme" />
-
-<!--        <TextView-->
-<!--            android:id="@+id/help_button"-->
-<!--            style="@style/ButtonStyle"-->
-<!--            android:text="@string/help"-->
-<!--            app:drawableLeftCompat="@drawable/ic_help" />-->
-
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <TextView
