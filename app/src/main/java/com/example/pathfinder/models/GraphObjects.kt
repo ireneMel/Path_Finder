@@ -59,7 +59,7 @@ class Graph(
 	}
 	
 	fun setCost(edge: Edge){
-		if (edges.contains(edge.from)) {
+		if (edges[edge.from]?.contains(edge.to) == true) {
 			edges[edge.from]!![edge.to] = edge.cost
 			reversedEdges[edge.to]!![edge.from] = edge.cost
 		}

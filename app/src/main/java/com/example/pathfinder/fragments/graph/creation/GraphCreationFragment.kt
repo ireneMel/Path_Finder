@@ -110,10 +110,14 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		lifecycleScope.launchWhenStarted {
 			graphReader.state.collect {
 				when (it) {
-					ReadState.ERROR       -> makeToast("Error while reading file.")
+					ReadState.ERROR       -> {
+						makeToast("Error while reading file.")
+						graphReader.reset()
+					}
 					is ReadState.FINISHED -> {
 						viewModel.loadGraph(it.graph)
 						makeToast("Success")
+						graphReader.reset()
 					}
 					else                  -> {}
 				}
@@ -123,8 +127,14 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		lifecycleScope.launchWhenStarted {
 			graphSaver.state.collect {
 				when (it) {
-					FileState.ERROR  -> makeToast("Error while saving file.")
-					FileState.CLOSED -> makeToast("Success")
+					FileState.ERROR  -> {
+						makeToast("Error while saving file.")
+						graphSaver.reset()
+					}
+					FileState.CLOSED -> {
+						makeToast("Success")
+						graphSaver.reset()
+					}
 					else             -> {}
 				}
 			}
@@ -147,13 +157,13 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	
 	private val dialog = GetPriceDialog()
 	private suspend fun getPrice(): Float = suspendCoroutine {
-		Log.d("Debug141", "getPrice: ${this}")
 		dialog.show(childFragmentManager, null)
 		dialog.setFragmentResultListener(GetPriceDialog.RESULT) { _, bundle ->
 			val result = bundle.getString(GetPriceDialog.RESULT)
 			it.resume(
 				try {
-					result!!.toFloat()
+					val ret = result!!.toFloat()
+					if (ret <= 0f) Float.NaN else ret
 				} catch (_: Exception) {
 					Float.NaN
 				}
@@ -222,7 +232,6 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	private val graphSaver: SaveGraphToFile by lazy {
 		SaveGraphToFile(
 			requireActivity().activityResultRegistry,
-			viewLifecycleOwner,
 			requireActivity().contentResolver
 		)
 	}
@@ -230,7 +239,6 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	private val graphReader: ReadGraphFromFile by lazy {
 		ReadGraphFromFile(
 			requireActivity().activityResultRegistry,
-			viewLifecycleOwner,
 			requireActivity().contentResolver
 		)
 	}

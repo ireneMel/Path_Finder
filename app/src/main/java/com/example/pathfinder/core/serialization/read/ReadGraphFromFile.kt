@@ -21,9 +21,7 @@ sealed class ReadState {
 }
 
 class ReadGraphFromFile(
-	registry: ActivityResultRegistry,
-	lifecycleOwner: LifecycleOwner,
-	private val contentResolver: ContentResolver
+	registry: ActivityResultRegistry, private val contentResolver: ContentResolver
 ) {
 	
 	companion object {
@@ -45,9 +43,7 @@ class ReadGraphFromFile(
 	private val itemRegex = Regex("\\([\\s\\S]*?\\)")
 	
 	private val getResultOpenFile = registry.register(
-		READ,
-		lifecycleOwner,
-		ActivityResultContracts.StartActivityForResult()
+		READ, ActivityResultContracts.StartActivityForResult()
 	) { result ->
 		if (result.resultCode == Activity.RESULT_OK) {
 			val data = result.data
@@ -58,17 +54,19 @@ class ReadGraphFromFile(
 				val vertices = readVertices(results[0].value)
 				val edges = readEdges(results[1].value)
 				_state.value = ReadState.FINISHED(Graph(vertices, edges))
-				_state.value = ReadState.IDLE
 			}
 		} else {
 			_state.value = ReadState.ERROR
-			_state.value = ReadState.IDLE
 		}
 	}
 	
-	private fun readVertices(text: String): HashMap<Int, Vertex>{
+	fun reset() {
+		_state.value = ReadState.IDLE
+	}
+	
+	private fun readVertices(text: String): HashMap<Int, Vertex> {
 		val map = hashMapOf<Int, Vertex>()
-		itemRegex.findAll(text).forEach{
+		itemRegex.findAll(text).forEach {
 			map.readVertex(it.value.substring(1, it.value.length - 1))
 		}
 		return map
@@ -79,7 +77,7 @@ class ReadGraphFromFile(
 		this[id.toInt()] = Vertex(PointF(x.toFloat(), y.toFloat()), cost.toFloat())
 	}
 	
-	private fun readEdges(text: String): MutableMap<Int,MutableMap<Int, Float>> {
+	private fun readEdges(text: String): MutableMap<Int, MutableMap<Int, Float>> {
 		val ret = mutableMapOf<Int, MutableMap<Int, Float>>()
 		itemRegex.findAll(text).forEach {
 			val (from, to, cost) = it.value.substring(1, it.value.length - 1).split(' ')

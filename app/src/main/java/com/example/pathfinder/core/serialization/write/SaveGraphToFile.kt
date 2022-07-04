@@ -14,7 +14,6 @@ import kotlin.properties.Delegates
 
 class SaveGraphToFile(
 	registry: ActivityResultRegistry,
-	lifecycleOwner: LifecycleOwner,
 	private val contentResolver: ContentResolver
 ) {
 	companion object {
@@ -40,7 +39,7 @@ class SaveGraphToFile(
 	}
 	
 	private val getResultCreateFile = registry.register(
-		WRITE, lifecycleOwner, ActivityResultContracts.StartActivityForResult()
+		WRITE, ActivityResultContracts.StartActivityForResult()
 	) { result ->
 		if (result.resultCode == Activity.RESULT_OK) {
 			val data = result.data
@@ -56,23 +55,24 @@ class SaveGraphToFile(
 				
 				//edges
 				it.write("{\n".toByteArray())
-				for ((from, map) in graph.edges){
-					for ((to, cost) in map){
+				for ((from, map) in graph.edges) {
+					for ((to, cost) in map) {
 						it.write(saveEdge(from, to, cost).toByteArray())
 					}
 				}
 				it.write("}".toByteArray())
 			}
 			_state.value = FileState.CLOSED
-			_state.value = FileState.IDLE
 		} else {
 			_state.value = FileState.ERROR
-			_state.value = FileState.IDLE
 		}
 	}
 	
-	private fun Vertex.save(id: Int): String =
-		"($id ${position.x} ${position.y} $cost)\n"
+	fun reset() {
+		_state.value = FileState.IDLE
+	}
+	
+	private fun Vertex.save(id: Int): String = "($id ${position.x} ${position.y} $cost)\n"
 	
 	private fun saveEdge(from: Int, to: Int, cost: Float): String = "($from $to $cost)\n"
 	
