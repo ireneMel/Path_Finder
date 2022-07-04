@@ -37,6 +37,6 @@
     <color name="red">#6A1C1C</color>
     <color name="red_variant">#431212</color>
     <color name="dark_red">#2C0404</color>
-    <color name="dracula_secondary_variant">#6C3333</color>
+    <color name="dracula_secondary_variant">#2C0404</color>
     <color name="dracula_on_secondary">#D36666</color>
 </resources>
