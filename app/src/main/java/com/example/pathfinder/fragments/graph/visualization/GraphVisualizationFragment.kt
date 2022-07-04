@@ -52,7 +52,7 @@ class GraphVisualizationFragment : Fragment(R.layout.fragment_graph_visualizatio
     private fun bindState(state: State) = with(binding) {
         val isSelecting = (state is State.SelectVertex)
 
-        playPause.text = if (viewModel.isPlaying) "Pause" else "Play"
+        playPause.text = if (viewModel.isPlaying) "Pause" else "Run"
 
         selectStart.isVisible = isSelecting
         selectEnd.isVisible = isSelecting

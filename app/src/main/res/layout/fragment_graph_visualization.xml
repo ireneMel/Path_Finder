@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="32dp"
         android:paddingEnd="32dp"
-        android:text="Play"
+        android:text="Run"
         app:layout_constraintBottom_toTopOf="@id/barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
