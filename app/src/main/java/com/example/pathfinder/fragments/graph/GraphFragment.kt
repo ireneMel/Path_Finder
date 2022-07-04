@@ -43,7 +43,6 @@ class GraphFragment : Fragment(R.layout.fragment_graph) {
     private val onPrimaryColor by lazy(LazyThreadSafetyMode.NONE) { getThemeColor(com.google.android.material.R.attr.colorOnPrimary) }
     private val secondaryColor by lazy(LazyThreadSafetyMode.NONE) { getThemeColor(com.google.android.material.R.attr.colorSecondary) }
     private val secondaryVariantColor by lazy(LazyThreadSafetyMode.NONE) { getThemeColor(com.google.android.material.R.attr.colorSecondaryVariant) }
-    private val onSecondaryColor by lazy(LazyThreadSafetyMode.NONE) { getThemeColor(com.google.android.material.R.attr.colorOnSecondary) }
 
     private val _1dp by lazy(LazyThreadSafetyMode.NONE) { resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT }
     private val defaultVertexDesign by lazy(LazyThreadSafetyMode.NONE) {

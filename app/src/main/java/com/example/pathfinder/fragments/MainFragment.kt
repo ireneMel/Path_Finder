@@ -5,17 +5,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import com.codertainment.materialintro.MaterialIntroConfiguration
-import com.codertainment.materialintro.sequence.SkipLocation
-import com.codertainment.materialintro.shape.ShapeType
 import com.codertainment.materialintro.utils.materialIntroSequence
 import com.example.pathfinder.R
 import com.example.pathfinder.databinding.FragmentMainBinding
 import com.example.pathfinder.fragments.graph.GraphFragment
-import com.example.pathfinder.fragments.graph.creation.GraphCreationFragment
+import com.example.pathfinder.utils.Hints.basicConfig
 
 class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var binding: FragmentMainBinding
@@ -49,20 +45,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
     }
 
-    private fun MaterialIntroConfiguration.basicConfig(mTargetView: View, message: String) {
-        isDotViewEnabled = true
-        isDotAnimationEnabled = true
-        infoCustomView = TextView(requireActivity()).apply {
-            text = message
-        }
-        infoTextAlignment = View.TEXT_ALIGNMENT_CENTER
-        targetView = mTargetView
-        showOnlyOnce = false
-        shapeType = ShapeType.CIRCLE
-        skipLocation = SkipLocation.TOP_RIGHT
-        userClickAsDisplayed = true
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -81,7 +63,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                     }
 
                     addConfig {
-                        basicConfig(binding.customizeButton, "You can customize Path Finder")
+                        basicConfig(
+                            binding.customizeButton,
+                            "You can customize Path Finder"
+                        )
                     }
                 }
                 return true

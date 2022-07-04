@@ -6,8 +6,12 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
+import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.codertainment.materialintro.utils.materialIntroSequence
 import com.example.pathfinder.R
 import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
 import com.example.pathfinder.core.serialization.read.ReadState
@@ -17,6 +21,7 @@ import com.example.pathfinder.databinding.FragmentGraphCreationBinding
 import com.example.pathfinder.dialogs.GetPriceDialog
 import com.example.pathfinder.fragments.graph.GraphFragment
 import com.example.pathfinder.fragments.graph.visualization.GraphVisualizationFragment
+import com.example.pathfinder.utils.Hints.basicConfig
 import kotlinx.coroutines.flow.collect
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -59,7 +64,7 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
         with(binding) {
             play.setOnClickListener {
                 parentFragmentManager.commit {
-                    add(R.id.graphContainer, GraphVisualizationFragment())
+                    replace(R.id.graphContainer, GraphVisualizationFragment())
                     addToBackStack(null)
                 }
             }
@@ -67,21 +72,11 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
             addEdge.setOnClickListener { viewModel.setEditState(Action.ADD_EDGE) }
             setPrice.setOnClickListener { viewModel.setEditState(Action.SET) }
             remove.setOnClickListener { viewModel.setEditState(Action.REMOVE) }
-//			open.setOnClickListener { graphReader.openFile() }
-//			save.setOnClickListener {
-//				val graph = binding.graph.graph
-//				if (graph != null) {
-//					graphSaver.createFile(graph)
-//				} else {
-//					makeToast("The canvas must not be empty")
-//				}
-//			}
         }
         if (requireArguments().getBoolean(OPEN_CLICKED)) {
             graphReader.openFile()
             requireArguments().putBoolean(OPEN_CLICKED, false)
         }
-
 
         lifecycleScope.launchWhenStarted {
             graphReader.state.collect {
@@ -153,6 +148,28 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
             }
             R.id.open_from_file -> {
                 graphReader.openFile()
+                return true
+            }
+
+            R.id.help_visualize -> {
+                materialIntroSequence(200, showSkip = true) {
+                    addConfig {basicConfig(
+                            binding.addVertex,
+                            "Click here to enter creating vertex mode")}
+                    addConfig {basicConfig(
+                            binding.addEdge,
+                            "Click here to enter creating edge mode")}
+                    addConfig { basicConfig(binding.remove, "Click here to enter removing mode") }
+                    addConfig {basicConfig(
+                            binding.setPrice,
+                            "Click here to set prices for edges or vertices")}
+                    addConfig {basicConfig(
+                            binding.play,
+                            "Click here to visualise the algorithm of finding the best path")}
+                    addConfig {basicConfig(
+                            binding.graph,
+                            "After choosing the mode by clicking buttons below, click on this area to create graph")}
+                }
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
