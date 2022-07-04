@@ -53,25 +53,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/open"
-        style="@style/ButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Load from file"
-        app:drawableLeftCompat="@drawable/ic_download"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!--    <com.google.android.material.textview.MaterialTextView-->
+    <!--        android:id="@+id/open"-->
+    <!--        style="@style/ButtonStyle"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="Load from file"-->
+    <!--        app:drawableLeftCompat="@drawable/ic_download"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/save"
-        style="@style/ButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save to file"
-        app:drawableLeftCompat="@drawable/ic_save"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!--    <com.google.android.material.textview.MaterialTextView-->
+    <!--        android:id="@+id/save"-->
+    <!--        style="@style/ButtonStyle"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="Save to file"-->
+    <!--        app:drawableLeftCompat="@drawable/ic_save"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/play"
@@ -86,12 +86,12 @@
     <androidx.constraintlayout.helper.widget.Flow
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:flow_wrapMode="aligned"
-        app:flow_horizontalGap="8dp"
-        app:flow_verticalGap="16dp"
         android:padding="8dp"
+        app:constraint_referenced_ids="addVertex,addEdge,setPrice,remove,play"
+        app:flow_horizontalGap="8dp"
         app:flow_horizontalStyle="spread_inside"
-        app:constraint_referenced_ids="addVertex,addEdge,setPrice,remove,open,save,play"
+        app:flow_verticalGap="16dp"
+        app:flow_wrapMode="aligned"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
