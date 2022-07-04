@@ -3,6 +3,7 @@ package com.example.pathfinder.fragments.graph.creation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.pathfinder.core.modes.*
+import com.example.pathfinder.core.uiGraph.BiEditUIGraph
 import com.example.pathfinder.core.uiGraph.EditUIGraph
 import com.example.pathfinder.core.uiGraph.finders.FindUIEdge
 import com.example.pathfinder.core.uiGraph.finders.FindUIVertex
@@ -25,7 +26,7 @@ enum class Action {
 }
 
 class GraphCreationViewModel(private var graphProvider: GraphProvider) : ViewModel() {
-	private val uiGraph = EditUIGraph(
+	private val uiGraph = BiEditUIGraph(
 		graphProvider.design, graph = graphProvider.graph
 	)
 	private val vertexFinder = FindUIVertex(graphProvider.design.vertexDesign.radius * 2)

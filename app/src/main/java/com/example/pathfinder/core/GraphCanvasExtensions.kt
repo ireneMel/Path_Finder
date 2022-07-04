@@ -3,9 +3,12 @@ package com.example.pathfinder.core
 import android.graphics.Canvas
 import android.graphics.PointF
 import android.graphics.Rect
+import androidx.core.graphics.minus
 import androidx.core.graphics.withRotation
 import com.example.pathfinder.core.uiGraph.*
 import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 fun Canvas.drawVertex(vertex: UIVertex) {
@@ -18,7 +21,50 @@ fun Canvas.drawVertex(vertex: UIVertex) {
 	)
 }
 
-fun Canvas.drawEdge(edge: UIEdge) {
+fun PointF.normalizeTo(dist: Float = 1f) {
+	val magnitude = dist / sqrt(x * x + y * y)
+	x *= magnitude
+	y *= magnitude
+}
+
+private var cos: Float = 0f
+private var sin: Float = 0f
+fun PointF.rotate(rad: Float) {
+	sin = sin(rad)
+	cos = cos(rad)
+	set(x * cos - y * sin, x * sin + y * cos)
+}
+
+fun PointF.rotateDeg(deg: Float) = rotate(180 * deg / Math.PI.toFloat())
+
+private val direction = PointF()
+private val endPosition = PointF()
+
+fun Canvas.drawOneEdge(edge: UIEdge, vertexRadius: Float) {
+	direction.x = edge.endPosition.x - edge.startPosition.x
+	direction.y = edge.endPosition.y - edge.startPosition.y
+	direction.normalizeTo(vertexRadius)
+	endPosition.set(edge.endPosition.x - direction.x, edge.endPosition.y - direction.y)
+	direction.normalizeTo(vertexRadius / 1.5f)
+	
+	direction.rotate(0.9f * Math.PI.toFloat())
+	drawLine(
+		endPosition.x + direction.x,
+		endPosition.y + direction.y,
+		endPosition.x,
+		endPosition.y,
+		edge.strokePaint
+	)
+	
+	direction.rotate(0.2f * Math.PI.toFloat())
+	drawLine(
+		endPosition.x + direction.x,
+		endPosition.y + direction.y,
+		endPosition.x,
+		endPosition.y,
+		edge.strokePaint
+	)
+	
 	drawLine(
 		edge.startPosition.x,
 		edge.startPosition.y,

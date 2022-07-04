@@ -5,7 +5,7 @@ import com.example.pathfinder.models.Edge
 import com.example.pathfinder.models.Graph
 import com.example.pathfinder.models.Vertex
 
-class EditUIGraph(
+abstract class EditUIGraph(
 	design: GraphDesign,
 	graph: Graph,
 	width: Float = 1f,
@@ -22,12 +22,6 @@ class EditUIGraph(
 	fun addVertexWithLocalSize(position: PointF) {
 		val index = graph.addVertex(Vertex(PointF(position.x / width, position.y / height)))
 		_vertices[index] = UIVertex(position, design.vertexDesign, "", design.textVertexPaint)
-	}
-	
-	fun addEdge(from: Int, to: Int) {
-		_edges[Edge(from, to)] =
-			UIEdge(from, to, design.edgeStrokePaint, "", design.textEdgePaint, design.textPadding)
-		graph.addEdge(from, to)
 	}
 	
 	fun removeVertex(index: Int) {
@@ -47,20 +41,75 @@ class EditUIGraph(
 		graph.reversedEdges.remove(index)
 	}
 	
-	fun removeEdge(edge: Edge) {
-		graph.edges[edge.from]?.remove(edge.to)
-		_edges.remove(edge)
-	}
-	
 	fun setVertexCost(index: Int, cost: Float) {
 		if (cost.isNaN()) return
 		_vertices[index]?.text = cost.toString()
 		graph.vertices[index]?.cost = cost
 	}
 	
-	fun setEdgeCost(edge: Edge) {
+	abstract fun addEdge(from: Int, to: Int)
+	
+	abstract fun removeEdge(edge: Edge)
+	
+	abstract fun setEdgeCost(edge: Edge)
+}
+
+class OneEditUIGraph(
+	design: GraphDesign,
+	graph: Graph,
+	width: Float = 1f,
+	height: Float = 1f,
+) : EditUIGraph(
+	design, graph, width, height
+) {
+	override fun addEdge(from: Int, to: Int) {
+		_edges[Edge(from, to)] =
+			UIEdge(from, to, design.edgeStrokePaint, "", design.textEdgePaint, design.textPadding)
+		graph.addEdge(from, to)
+	}
+	
+	override fun removeEdge(edge: Edge) {
+		graph.edges[edge.from]?.remove(edge.to)
+		_edges.remove(edge)
+	}
+	
+	override fun setEdgeCost(edge: Edge) {
 		if (edge.cost.isNaN()) return
 		graph.edges[edge.from]!![edge.to] = edge.cost
 		_edges[edge]?.text = edge.cost.toString()
+	}
+}
+
+
+class BiEditUIGraph(
+	design: GraphDesign,
+	graph: Graph,
+	width: Float = 1f,
+	height: Float = 1f,
+) : EditUIGraph(
+	design, graph, width, height
+) {
+	override fun addEdge(from: Int, to: Int) {
+		_edges[Edge(from, to)] =
+			UIEdge(from, to, design.edgeStrokePaint, "", design.textEdgePaint, design.textPadding)
+		_edges[Edge(to, from)] =
+			UIEdge(to, from, design.edgeStrokePaint, "", design.textEdgePaint, design.textPadding)
+		graph.addEdge(from, to)
+		graph.addEdge(to, from)
+	}
+	
+	override fun removeEdge(edge: Edge) {
+		graph.edges[edge.from]?.remove(edge.to)
+		graph.edges[edge.to]?.remove(edge.from)
+		_edges.remove(edge)
+		_edges.remove(Edge(from = edge.to, to = edge.from))
+	}
+	
+	override fun setEdgeCost(edge: Edge) {
+		if (edge.cost.isNaN()) return
+		graph.edges[edge.from]!![edge.to] = edge.cost
+		graph.edges[edge.to]!![edge.from] = edge.cost
+		_edges[edge]?.text = edge.cost.toString()
+		_edges[Edge(edge.to, edge.from)]?.text = edge.cost.toString()
 	}
 }

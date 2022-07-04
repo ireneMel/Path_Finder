@@ -9,7 +9,7 @@ import com.example.pathfinder.core.uiGraph.UIVertexLabel
 class DefaultDrawMode(private val graph: UIGraph) : DrawMode {
 	override fun onDraw(canvas: Canvas) {
 		for ((_, edge) in graph.edges) {
-			canvas.drawEdge(edge)
+			canvas.drawOneEdge(edge, graph.design.vertexDesign.radius)
 			if (edge is UIEdgeLabel && edge.text.isNotBlank()) canvas.drawEdgeText(edge)
 		}
 		for ((_, vertex) in graph.vertices) {
