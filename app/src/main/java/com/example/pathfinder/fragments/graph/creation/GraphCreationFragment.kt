@@ -63,9 +63,13 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 
         with(binding) {
             play.setOnClickListener {
-                parentFragmentManager.commit {
-                    replace(R.id.graphContainer, GraphVisualizationFragment())
-                    addToBackStack(null)
+                if(graph.graph?.vertices?.isEmpty() == true) {
+                    makeToast("The canvas must not be empty")
+                } else {
+                    parentFragmentManager.commit {
+                        replace(R.id.graphContainer, GraphVisualizationFragment())
+                        addToBackStack(null)
+                    }
                 }
             }
             addVertex.setOnClickListener { viewModel.setEditState(Action.ADD_VERTEX) }
