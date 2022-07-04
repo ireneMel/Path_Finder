@@ -10,8 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pathfinder.customization.ThemeClickListener
 import com.example.pathfinder.customization.ThemeManager
-import com.example.pathfinder.customization.ThemeStorage.Companion.getThemeColor
-import com.example.pathfinder.customization.ThemeStorage.Companion.saveThemeColor
+import com.example.pathfinder.customization.ThemeStorage.getThemeColor
+import com.example.pathfinder.customization.ThemeStorage.saveThemeColor
 import com.example.pathfinder.customization.recyclerview.DataSource
 import com.example.pathfinder.customization.recyclerview.ThemeListAdapter
 import com.example.pathfinder.databinding.FragmentCustomizationBinding

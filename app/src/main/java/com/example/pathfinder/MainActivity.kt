@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
 		if (savedInstanceState == null) {
 			supportFragmentManager.commit {
 				replace(R.id.container, MainFragment())
-//				replace(R.id.container, GraphCreationFragment())
 			}
 		}
 	}
