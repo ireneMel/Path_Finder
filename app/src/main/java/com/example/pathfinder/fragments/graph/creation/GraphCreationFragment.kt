@@ -1,5 +1,6 @@
 package com.example.pathfinder.fragments.graph.creation
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -14,6 +15,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.codertainment.materialintro.utils.materialIntroSequence
 import com.example.pathfinder.R
+import com.example.pathfinder.core.modes.AddEdgeMode
+import com.example.pathfinder.core.modes.AddVertexMode
+import com.example.pathfinder.core.modes.RemoveMode
+import com.example.pathfinder.core.modes.SetPriceMode
 import com.example.pathfinder.core.serialization.read.ReadGraphFromFile
 import com.example.pathfinder.core.serialization.read.ReadState
 import com.example.pathfinder.core.serialization.write.FileState
@@ -23,6 +28,8 @@ import com.example.pathfinder.dialogs.GetPriceDialog
 import com.example.pathfinder.fragments.graph.GraphFragment
 import com.example.pathfinder.fragments.graph.visualization.GraphVisualizationFragment
 import com.example.pathfinder.utils.Hints.basicConfig
+import com.example.pathfinder.utils.getThemeColor
+import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlin.coroutines.resume
@@ -95,12 +102,18 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 					}
 				}
 			}
-			addVertex.setOnClickListener { viewModel.setEditState(Action.ADD_VERTEX) }
-			addEdge.setOnClickListener { viewModel.setEditState(Action.ADD_EDGE) }
+			addVertex.setOnClickListener {
+				viewModel.setEditState(Action.ADD_VERTEX)
+			}
+			addEdge.setOnClickListener {
+				viewModel.setEditState(Action.ADD_EDGE)
+			}
 			setPrice.setOnClickListener {
 				viewModel.setEditState(Action.SET)
 			}
-			remove.setOnClickListener { viewModel.setEditState(Action.REMOVE) }
+			remove.setOnClickListener {
+				viewModel.setEditState(Action.REMOVE)
+			}
 		}
 		if (requireArguments().getBoolean(OPEN_CLICKED)) {
 			graphReader.openFile()
@@ -141,13 +154,35 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 		}
 	}
 	
+	private fun setSelected(button: MaterialTextView) {
+		unselectAll()
+		button.backgroundTintList =
+			ColorStateList.valueOf(getThemeColor(com.google.android.material.R.attr.colorSecondary))
+	}
+	
+	private fun unselectAll() = with(binding) {
+		unselect(addVertex)
+		unselect(addEdge)
+		unselect(setPrice)
+		unselect(remove)
+	}
+	
+	private fun unselect(button: MaterialTextView) {
+		button.backgroundTintList =
+			ColorStateList.valueOf(getThemeColor(com.google.android.material.R.attr.colorPrimary))
+	}
+	
 	private suspend fun bindState(state: State) {
 		Log.d("Debug141", "bindState: $state")
-		with(binding.graph) {
-			drawMode = state.combinedMode
-			touchMode = state.combinedMode
+		with(binding) {
+			graph.drawMode = state.drawMode
+			graph.touchMode = state.touchMode
 			if (state is State.Edit) {
-				graph = state.uiGraph
+				graph.graph = state.uiGraph
+				if (graph.touchMode is AddVertexMode) setSelected(addVertex)
+				if (graph.touchMode is AddEdgeMode) setSelected(addEdge)
+				if (graph.touchMode is SetPriceMode) setSelected(setPrice)
+				if (graph.touchMode is RemoveMode) setSelected(remove)
 			}
 		}
 		if (state is State.SetPrice) {
@@ -231,15 +266,13 @@ class GraphCreationFragment : Fragment(R.layout.fragment_graph_creation) {
 	
 	private val graphSaver: SaveGraphToFile by lazy {
 		SaveGraphToFile(
-			requireActivity().activityResultRegistry,
-			requireActivity().contentResolver
+			requireActivity().activityResultRegistry, requireActivity().contentResolver
 		)
 	}
 	
 	private val graphReader: ReadGraphFromFile by lazy {
 		ReadGraphFromFile(
-			requireActivity().activityResultRegistry,
-			requireActivity().contentResolver
+			requireActivity().activityResultRegistry, requireActivity().contentResolver
 		)
 	}
 	

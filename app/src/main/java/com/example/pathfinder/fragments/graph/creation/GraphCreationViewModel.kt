@@ -16,9 +16,11 @@ import com.example.pathfinder.models.Graph
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-sealed class State(val combinedMode: CombinedMode) {
-	class Edit(val uiGraph: EditUIGraph, combinedMode: CombinedMode) : State(combinedMode)
-	abstract class SetPrice(val editState: Edit) : State(editState.combinedMode)
+sealed class State(val touchMode: TouchMode, val drawMode: DrawMode) {
+	class Edit(val uiGraph: EditUIGraph, touchMode: TouchMode, drawMode: DrawMode) :
+		State(touchMode, drawMode)
+	
+	abstract class SetPrice(val editState: Edit) : State(editState.touchMode, editState.drawMode)
 	class SetVertexPrice(val vertexId: Int, editState: Edit) : SetPrice(editState)
 	class SetEdgePrice(val edge: Edge, editState: Edit) : SetPrice(editState)
 }
@@ -38,27 +40,37 @@ class GraphCreationViewModel(private var graphProvider: GraphProvider, isBiGraph
 	private val vertexFinder = FindUIVertex(graphProvider.design.vertexDesign.radius * 2)
 	private val edgeFinder = FindUIEdge(graphProvider.design.vertexDesign.radius)
 	private val _state = MutableStateFlow<State>(
-		State.Edit(uiGraph, DefaultMode(uiGraph))
+		State.Edit(uiGraph, DefaultTouchMode, DefaultDrawMode(uiGraph))
 	)
 	
 	val state = _state.asStateFlow()
 	
-	private fun getModes(state: Action) = when (state) {
-		DEFAULT    -> DefaultMode(uiGraph)
-		ADD_VERTEX -> CombineMods(DefaultDrawMode(uiGraph), AddVertexMode(uiGraph))
-		ADD_EDGE   -> AddEdgeMode(vertexFinder, uiGraph)
-		REMOVE     -> CombineMods(
-			DefaultDrawMode(uiGraph), RemoveMode(vertexFinder, edgeFinder, uiGraph)
-		)
-		SET        -> CombineMods(
-			DefaultDrawMode(uiGraph),
-			SetPriceMode(vertexFinder, edgeFinder, uiGraph, ::onVertexSet, ::onEdgeSet)
-		)
-	}
-	
 	fun setEditState(state: Action) {
 		Log.d("Debug141", "setEditState: ")
-		_state.value = State.Edit(uiGraph, getModes(state))
+		_state.value = when (state) {
+			DEFAULT    -> State.Edit(uiGraph, DefaultTouchMode, DefaultDrawMode(uiGraph))
+			ADD_VERTEX -> State.Edit(uiGraph, AddVertexMode(uiGraph), DefaultDrawMode(uiGraph))
+			ADD_EDGE   -> {
+				val mode = AddEdgeMode(vertexFinder, uiGraph)
+				State.Edit(uiGraph, mode, mode)
+			}
+			REMOVE     -> State.Edit(
+				uiGraph,
+				RemoveMode(vertexFinder, edgeFinder, uiGraph),
+				DefaultDrawMode(uiGraph)
+			)
+			SET        -> State.Edit(
+				uiGraph,
+				SetPriceMode(
+					vertexFinder,
+					edgeFinder,
+					uiGraph,
+					::onVertexSet,
+					::onEdgeSet
+				),
+				DefaultDrawMode(uiGraph)
+			)
+		}
 	}
 	
 	private fun onVertexSet(id: Int) {
@@ -90,7 +102,8 @@ class GraphCreationViewModel(private var graphProvider: GraphProvider, isBiGraph
 		_state.compareAndSet(state, state)
 	}
 	
-	class Factory(private val graphProvider: GraphProvider, private val isBiGraph: Boolean) : ViewModelProvider.Factory {
+	class Factory(private val graphProvider: GraphProvider, private val isBiGraph: Boolean) :
+		ViewModelProvider.Factory {
 		override fun <T : ViewModel> create(modelClass: Class<T>): T {
 			return GraphCreationViewModel(graphProvider, isBiGraph) as T
 		}

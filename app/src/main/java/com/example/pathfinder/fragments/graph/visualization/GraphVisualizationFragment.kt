@@ -1,5 +1,6 @@
 package com.example.pathfinder.fragments.graph.visualization
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -12,9 +13,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.codertainment.materialintro.utils.materialIntroSequence
 import com.example.pathfinder.R
+import com.example.pathfinder.customization.ThemeStorage.getThemeColor
 import com.example.pathfinder.databinding.FragmentGraphVisualizationBinding
 import com.example.pathfinder.fragments.graph.GraphFragment
 import com.example.pathfinder.utils.Hints.basicConfig
+import com.example.pathfinder.utils.getThemeColor
+import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.flow.collect
 
 class GraphVisualizationFragment : Fragment(R.layout.fragment_graph_visualization) {
@@ -39,8 +43,12 @@ class GraphVisualizationFragment : Fragment(R.layout.fragment_graph_visualizatio
     }
 
     private fun bindStable() = with(binding) {
-        selectStart.setOnClickListener { viewModel.setAction(Action.SELECT_START) }
-        selectEnd.setOnClickListener { viewModel.setAction(Action.SELECT_END) }
+        selectStart.setOnClickListener {
+            viewModel.setAction(Action.SELECT_START)
+        }
+        selectEnd.setOnClickListener {
+            viewModel.setAction(Action.SELECT_END)
+        }
         playPause.setOnClickListener {
             viewModel.setAction(if (viewModel.isPlaying) Action.PAUSE else Action.PLAY)
         }
@@ -51,6 +59,15 @@ class GraphVisualizationFragment : Fragment(R.layout.fragment_graph_visualizatio
 
     private fun bindState(state: State) = with(binding) {
         val isSelecting = (state is State.SelectVertex)
+        if(isSelecting){
+            if(state is State.SelectStartVertex)
+                setSelected(selectStart)
+            else
+                setSelected(selectEnd)
+        } else {
+            unselect(selectStart)
+            unselect(selectEnd)
+        }
 
         playPause.text = if (viewModel.isPlaying) "Pause" else "Run"
 
@@ -66,6 +83,18 @@ class GraphVisualizationFragment : Fragment(R.layout.fragment_graph_visualizatio
         graph.graph = state.uiGraph
         graph.touchMode = state.combinedMode
         graph.drawMode = state.combinedMode
+    }
+    
+    private fun setSelected(button: MaterialTextView) = with(binding){
+        unselect(selectStart)
+        unselect(selectEnd)
+        button.backgroundTintList =
+            ColorStateList.valueOf(getThemeColor(com.google.android.material.R.attr.colorSecondary))
+    }
+    
+    private fun unselect(button: MaterialTextView){
+        button.backgroundTintList =
+            ColorStateList.valueOf(getThemeColor(com.google.android.material.R.attr.colorPrimary))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
