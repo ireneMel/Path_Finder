@@ -79,19 +79,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Play"
-        app:drawableLeftCompat="@drawable/ic_save"
+        app:drawableLeftCompat="@drawable/ic_play_arrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.helper.widget.Flow
+        android:layout_marginBottom="16dp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        app:constraint_referenced_ids="addVertex,addEdge,setPrice,remove,play"
+        app:constraint_referenced_ids="addVertex,addEdge,remove,setPrice,play"
         app:flow_horizontalGap="8dp"
-        app:flow_horizontalStyle="spread_inside"
+        app:flow_horizontalStyle="spread"
         app:flow_verticalGap="16dp"
-        app:flow_wrapMode="aligned"
+        app:flow_wrapMode="chain"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
