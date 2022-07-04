@@ -61,13 +61,17 @@ data class AlgoDesign(
 data class GraphDesign(
 	val vertexDesign: UIVertexDesign,
 	val edgeStrokePaint: Paint,
-	val textPaint: Paint,
+	val textEdgePaint: Paint,
+	val textVertexPaint: Paint,
 	val textPadding: Float,
 ){
 	init {
 		edgeStrokePaint.style = Paint.Style.STROKE
-		textPaint.isAntiAlias = true
-		textPaint.textAlign = Paint.Align.CENTER
+		textVertexPaint.isAntiAlias = true
+		textVertexPaint.textAlign = Paint.Align.CENTER
+
+		textEdgePaint.isAntiAlias = true
+		textEdgePaint.textAlign = Paint.Align.CENTER
 	}
 }
 
@@ -120,7 +124,7 @@ abstract class UIGraph(
 			position = PointF(position.x * width, position.y * height),
 			design = design.vertexDesign,
 			text = if (cost.isNaN()) "" else cost.toString(),
-			textPaint = design.textPaint
+			textPaint = design.textVertexPaint
 		)
 	}
 	
@@ -130,7 +134,7 @@ abstract class UIGraph(
 			to = to,
 			strokePaint = design.edgeStrokePaint,
 			text = if (cost.isNaN()) "" else cost.toString(),
-			textPaint = design.textPaint,
+			textPaint = design.textEdgePaint,
 			textPadding = design.textPadding
 		)
 	}

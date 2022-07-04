@@ -21,12 +21,12 @@ class EditUIGraph(
 	
 	fun addVertexWithLocalSize(position: PointF) {
 		val index = graph.addVertex(Vertex(PointF(position.x / width, position.y / height)))
-		_vertices[index] = UIVertex(position, design.vertexDesign, "", design.textPaint)
+		_vertices[index] = UIVertex(position, design.vertexDesign, "", design.textVertexPaint)
 	}
 	
 	fun addEdge(from: Int, to: Int) {
 		_edges[Edge(from, to)] =
-			UIEdge(from, to, design.edgeStrokePaint, "", design.textPaint, design.textPadding)
+			UIEdge(from, to, design.edgeStrokePaint, "", design.textEdgePaint, design.textPadding)
 		graph.addEdge(from, to)
 	}
 	
